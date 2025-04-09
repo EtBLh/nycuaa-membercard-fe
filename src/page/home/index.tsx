@@ -1,5 +1,4 @@
 import { IdCard } from "lucide-react";
-import logo from '@/assets/logo.png';
 import UploadIconForm from "./UploadIcon";
 import { useState } from "react";
 import ConfirmMemberDataForm from "./ConfirmMemberData";
