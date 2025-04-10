@@ -1,13 +1,7 @@
 import CardLayout from '@/components/CardLayout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { api } from '@/lib/utils';
@@ -41,7 +35,7 @@ export default function LoginPage() {
   const check_token = useMutation({
     mutationKey: ['check_token', token],
     mutationFn: () => {
-      return api.post('/member/check_token')
+      return api.post('/admin/check_token')
     },
     onSuccess: (res) => {
       if (res.status === 200) {
@@ -63,7 +57,7 @@ export default function LoginPage() {
   }, [token])
 
   const { mutate: onLogin, isPending: loginLoading, error: loginError } = useMutation({
-    mutationFn: (data: LoginFormData) => api.post('/login', {
+    mutationFn: (data: LoginFormData) => api.post('/admin/login', {
       govid: data.govid,
       name: data.name
     }),
@@ -114,14 +108,9 @@ export default function LoginPage() {
   return <CardLayout>
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl flex flex-row items-center justify-center gap-2">
-          <IdCard className='w-[32px] h-[32px]' />會員證系統
+        <CardTitle className="text-xl flex flex-col items-center justify-center gap-2">
+          <IdCard className='w-[48px] h-[48px]' />Member Card System Admin Panel
         </CardTitle>
-        <CardDescription>
-          {
-            isVerifying ? `驗證碼已寄到郵箱 ${membermail}` : '請輸入身分證號碼和姓名以登入'
-          }
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit((data) => isVerifying ? onVerify(data) : onLogin(data))}>
@@ -129,40 +118,26 @@ export default function LoginPage() {
             {!isVerifying && (
               <>
                 <div className="grid gap-2">
-                  <Label htmlFor="name">會員姓名</Label>
+                  <Label htmlFor="name">Account</Label>
                   <Input id="name" {...register('name')} />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="govid">會員身分證號碼</Label>
+                  <Label htmlFor="govid">Password</Label>
                   <Input id="govid" {...register('govid')} />
                 </div>
               </>
             )}
-            {isVerifying && (
-              <div className="grid gap-2">
-                <div className='flex items-center justify-center pb-2'>
-                  <InputOTP maxLength={6} value={code} onChange={code => setValue('code', code)}>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                    </InputOTPGroup>
-                    <InputOTPSeparator />
-                    <InputOTPGroup>
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-              </div>
-            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {
-                loading ? <Spinner className='text-[black]' size={"small"} /> : (isVerifying ? '登入' : '取得驗證碼')
+                loading ? <Spinner className='text-[black]' size={"small"} /> : 'Login'
               }
             </Button>
             {error && errorMessage && <p className="text-sm text-destructive text-center">{errorMessage}</p>}
+            <div className="text-right text-sm">
+              <Link to="/login" className="underline underline-offset-4">
+                會員按這𥚃！
+              </Link>
+            </div>
           </div>
         </form>
       </CardContent>

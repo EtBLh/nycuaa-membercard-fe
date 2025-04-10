@@ -8,7 +8,7 @@ import {
 import { Button } from "./ui/button";
 import { ChevronDown, Languages, LogOut } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { clearToken } from "@/redux/authSlice";
+import { logout } from "@/store";
 
 const CardLayout = (props: {
     header?: React.ReactNode
@@ -36,7 +36,7 @@ const CardLayout = (props: {
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent align="end" sideOffset={16} alignOffset={4} >
-                                        <DropdownMenuItem onClick={() => dispatch(clearToken())}>
+                                        <DropdownMenuItem onClick={() => dispatch(logout())}>
                                             <LogOut />登出
                                         </DropdownMenuItem>
                                     </DropdownMenuContent>

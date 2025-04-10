@@ -4,6 +4,7 @@ import MemberCardPage from './page/membercard'
 import AdminPage from './page/admin'
 import CheckInPage from './page/checkIn'
 import LoginPage from "./page/login";
+import AdminLoginPage from "./page/admin/login";
 import HelpPage from "./page/help";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
@@ -14,7 +15,6 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route index element={<Navigate to="/login" />}/>
-          <Route path='admin' element={<AdminPage />}/>
           <Route path='login' element={<LoginPage />}/>
 
           <Route element={<ProtectedRoute />}>
@@ -23,6 +23,16 @@ function App() {
             <Route path='membercard' element={<MemberCardPage />}/>
             <Route path='help' element={<HelpPage />}/>
           </Route>
+
+          <Route path='admin'>
+            <Route path='login' element={<AdminLoginPage />}/>
+
+            <Route element={<ProtectedRoute isAdmin/>}>
+              <Route index element={<AdminPage />}/>
+            </Route>
+          </Route>
+
+          
         </Routes>
       </BrowserRouter>
     </div>

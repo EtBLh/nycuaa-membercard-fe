@@ -14,9 +14,10 @@ import { Spinner } from '@/components/ui/spinner';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { RootState } from '@/store';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { nextStep } from '@/redux/memberHomeSlice';
 
-const UploadIconForm = (props: {next: () => void}) => {
+const UploadIconForm = () => {
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [hasExistingIcon, setHasExistingIcon] = useState(false);
@@ -24,6 +25,7 @@ const UploadIconForm = (props: {next: () => void}) => {
 
   const queryClient = useQueryClient();
   const token = useSelector<RootState>(state => state.auth?.token);
+  const dispatch = useDispatch();
 
   const icon = useQuery({
     queryKey: ['icon', token],
@@ -59,7 +61,7 @@ const UploadIconForm = (props: {next: () => void}) => {
     onSuccess: (res) => {
       if (res.status === 200) {
         setHasExistingIcon(true);
-        props.next();
+        dispatch(nextStep());
         queryClient.invalidateQueries({ queryKey: ['icon', token] })
       }
     },
@@ -92,7 +94,7 @@ const UploadIconForm = (props: {next: () => void}) => {
     if (!hasExistingIcon || image) {
       upload.mutate(image)
     } else if (hasExistingIcon && !image) {
-      props.next();
+      dispatch(nextStep());
     }
   }
 
@@ -133,7 +135,7 @@ const UploadIconForm = (props: {next: () => void}) => {
               icon.isLoading && (
                 <div className='flex gap-2'>
                   <Spinner className='text-[black]' size={"small"}/> 
-                  加載大頭照中
+                  載入大頭照中
                 </div>
               )
             }

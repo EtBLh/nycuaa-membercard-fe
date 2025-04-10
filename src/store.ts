@@ -1,27 +1,38 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, PayloadAction } from '@reduxjs/toolkit';
 import { combineReducers } from 'redux';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // defaults to localStorage
 import { PersistConfig, persistStore } from 'redux-persist';
 import authReducer from './redux/authSlice';
-import memberDataReducer from './redux/memberDataSlice';
+import memberHomeReducer from './redux/memberHomeSlice';
 
 const persistConfig: PersistConfig<any> = {
   key: 'root',
   storage,
 };
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
   auth: authReducer,
-  member: memberDataReducer
+  memberHome: memberHomeReducer
 });
 
-//@ts-ignore
+const rootReducer = (state: any, action: PayloadAction) => {
+  if (action.type === 'logout') {
+    state = undefined; // resets the whole store
+  }
+  return appReducer(state, action);
+};
+
+export default rootReducer;
+
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
-  reducer: persistedReducer,
-  // Add other middleware if needed
+  reducer: persistedReducer
+});
+
+export const logout = () => ({
+  type: 'logout',
 });
 
 export const persistor = persistStore(store);

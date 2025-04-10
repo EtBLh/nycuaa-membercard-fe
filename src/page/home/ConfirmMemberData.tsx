@@ -17,16 +17,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { api } from '@/lib/utils';
+import { nextStep, prevStep } from '@/redux/memberHomeSlice';
 import { RootState } from '@/store';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { ArrowLeft, Info } from 'lucide-react';
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
-const ConfirmMemberDataForm = (props: { next: () => void, back: () => void }) => {
+const ConfirmMemberDataForm = () => {
   const token = useSelector<RootState>(state => state.auth?.token);
   const [errorMessage, setErrorMessage] = useState('');
+  const dispatch = useDispatch();
 
   const { data: member, isLoading: memberLoading, isError: memberError } = useQuery({
     queryKey: ['memberdata', token],
@@ -41,7 +43,7 @@ const ConfirmMemberDataForm = (props: { next: () => void, back: () => void }) =>
       return res;
     },
     onSuccess: (res) => {
-      if (res.status === 200) props.next()
+      if (res.status === 200) dispatch(nextStep())
       else {
         setErrorMessage('出錯了 QQ')
       }
@@ -57,7 +59,7 @@ const ConfirmMemberDataForm = (props: { next: () => void, back: () => void }) =>
 
   return (
     <Card className='relative'>
-      <Button onClick={props.back} variant='ghost' className='absolute top-2 left-2 w-[36px] h-[36px]'>
+      <Button onClick={() => dispatch(prevStep())} variant='ghost' className='absolute top-2 left-2 w-[36px] h-[36px]'>
         <ArrowLeft />
       </Button>
       <CardHeader className="text-center">

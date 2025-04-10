@@ -1,12 +1,14 @@
 import { IdCard } from "lucide-react";
 import UploadIconForm from "./UploadIcon";
-import { useState } from "react";
 import ConfirmMemberDataForm from "./ConfirmMemberData";
 import DownloadMemberCardForm from "./DownloadMemberCard";
 import CardLayout from "@/components/CardLayout";
+import { useSelector } from "react-redux";
+import { selectStep } from "@/redux/memberHomeSlice";
 
 const Page = () => {
-  const [step, setStep] = useState(0);
+  const step = useSelector(selectStep);
+
   return (
     <CardLayout
       options
@@ -16,15 +18,10 @@ const Page = () => {
         </>
       }>
       {
-        step === 0 && <UploadIconForm 
-          next={() => setStep(prev => prev + 1)} 
-        />
+        step === 0 && <UploadIconForm />
       }
       {
-        step === 1 && <ConfirmMemberDataForm 
-          next={() => setStep(prev => prev + 1)} 
-          back={() => setStep(prev => prev - 1)}
-        />
+        step === 1 && <ConfirmMemberDataForm />
       }
       {
         step === 2 && <DownloadMemberCardForm />

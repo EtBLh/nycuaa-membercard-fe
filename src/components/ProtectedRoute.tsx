@@ -3,32 +3,35 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { RootState } from '../store';
 import { api } from '@/lib/utils';
-import { clearToken } from '@/redux/authSlice';
+import { logout } from '@/store';
 
-export default function ProtectedRoute() {
+export default function ProtectedRoute(props: { isAdmin?: boolean }) {
   const token = useSelector((state: RootState) => state.auth?.token);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const loginUrl = props.isAdmin ? '/admin/login' : 'login';
+
   React.useEffect(() => {
     if (!token) {
-      navigate('/login');
+      navigate(loginUrl);
     } else {
-        api.post('/member/check_token', {}, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+      const apiUrl = props.isAdmin ? '/admin/check_token' : '/member/check_token';
+      api.post(apiUrl, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
         .then((response) => {
           if (response.status !== 200) {
-            dispatch(clearToken())
-            navigate('/login');
+            dispatch(logout())
+            navigate(loginUrl);
           }
         })
         .catch((err) => {
           if (err.status !== 200) {
-            dispatch(clearToken())
-            navigate('/login');
+            dispatch(logout())
+            navigate(loginUrl);
           }
         })
     }

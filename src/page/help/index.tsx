@@ -77,7 +77,7 @@ const Page = () => {
 
 const IOSGuide = [
     {
-        title: 'Step1: 輸入姓名與身份證號碼',
+        title: 'Step1: 輸入姓名與身分證號碼',
         img: stepEnterNameGovid,
     },
     {
@@ -106,10 +106,10 @@ const AndroidGuide = [
     {
         title: 'Step0: 安裝Pass2U',
         img: stepInstallPass2U,
-        description: <a href='https://play.google.com/store/apps/details?id=com.passesalliance.wallet' style={{ textDecoration: 'underline' }}>點此下載Pass2U Wallet應用程序</a>
+        description: <a href='https://play.google.com/store/apps/details?id=com.passesalliance.wallet' style={{ textDecoration: 'underline' }}>點此下載Pass2U Wallet應用程式</a>
     },
     {
-        title: 'Step1: 輸入姓名與身份證號碼',
+        title: 'Step1: 輸入姓名與身分證號碼',
         img: stepEnterNameGovid,
     },
     {

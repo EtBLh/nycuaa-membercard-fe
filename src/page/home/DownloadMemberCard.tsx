@@ -7,7 +7,7 @@ import {
     CardTitle
 } from '@/components/ui/card';
 import { api } from '@/lib/utils';
-import { clearToken } from '@/redux/authSlice';
+import { logout } from '@/store';
 import { RootState } from '@/store';
 import { useQuery } from '@tanstack/react-query';
 import { IdCard } from 'lucide-react';
@@ -26,10 +26,6 @@ const DownloadMemberCardForm = () => {
         select: res => res.data
     })
 
-    const logout = () => {
-        dispatch(clearToken());
-    }
-
     if (!token) return;
 
     return (
@@ -40,12 +36,12 @@ const DownloadMemberCardForm = () => {
                     <span>會員證製作成功!</span>
                 </CardTitle>
                 <CardDescription>
-                    會員證已寄到 {member.email}
+                    會員證已寄到 {member?.email ? member.email : 'loading...'}
                 </CardDescription>
             </CardHeader>
             <CardContent className='flex flex-col w-full'>
                 <div className="flex flex-row items-center justify-center gap-2">
-                    <Button onClick={logout} disabled={false} variant='outline'>
+                    <Button onClick={() => dispatch(logout())} disabled={false} variant='outline'>
                         登出
                     </Button>
                     <a href={`${import.meta.env.VITE_API_HOST}/api/download/member_pass.pkpass?token=${token}`} download>
