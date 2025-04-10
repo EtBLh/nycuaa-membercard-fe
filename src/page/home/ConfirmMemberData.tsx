@@ -94,7 +94,7 @@ const ConfirmMemberDataForm = (props: { next: () => void, back: () => void }) =>
             <Label>繳費狀態</Label>
             <Badge className='my-1' variant={member.permit ? undefined : 'destructive'}>
               {
-                member.permit ? '已繳費！' : '尚未繳費'
+                member.permit ? '已繳費！' : '系統暫無繳費紀錄'
               }
             </Badge>
 
