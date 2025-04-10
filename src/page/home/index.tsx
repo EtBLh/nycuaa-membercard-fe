@@ -9,16 +9,22 @@ const Page = () => {
   const [step, setStep] = useState(0);
   return (
     <CardLayout
+      options
       header={
         <>
-          <IdCard className='w-[24px] h-[24px]' />製作會員證
+          <IdCard/>製作會員證
         </>
       }>
       {
-        step === 0 && <UploadIconForm next={() => setStep(prev => prev + 1)} />
+        step === 0 && <UploadIconForm 
+          next={() => setStep(prev => prev + 1)} 
+        />
       }
       {
-        step === 1 && <ConfirmMemberDataForm next={() => setStep(prev => prev + 1)} />
+        step === 1 && <ConfirmMemberDataForm 
+          next={() => setStep(prev => prev + 1)} 
+          back={() => setStep(prev => prev - 1)}
+        />
       }
       {
         step === 2 && <DownloadMemberCardForm />

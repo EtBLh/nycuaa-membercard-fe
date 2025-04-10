@@ -3,7 +3,8 @@ import HomePage from './page/home/index.tsx'
 import MemberCardPage from './page/membercard'
 import AdminPage from './page/admin'
 import CheckInPage from './page/checkIn'
-import LoginPage from "./page/login.tsx";
+import LoginPage from "./page/login";
+import HelpPage from "./page/help";
 import ProtectedRoute from "./components/ProtectedRoute.tsx";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path='home' element={<HomePage />}/>
             <Route path='check-in' element={<CheckInPage />}/>
             <Route path='membercard' element={<MemberCardPage />}/>
+            <Route path='help' element={<HelpPage />}/>
           </Route>
         </Routes>
       </BrowserRouter>

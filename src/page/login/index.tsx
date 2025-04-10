@@ -119,7 +119,7 @@ export default function LoginPage() {
         </CardTitle>
         <CardDescription>
           {
-            isVerifying ? `驗證碼已寄到郵箱 ${membermail}` : '請輸入身分證號碼和姓名以登入'
+            isVerifying ? `驗證碼已寄到郵箱 ${membermail}` : '請輸入身份證號碼和姓名以登入'
           }
         </CardDescription>
       </CardHeader>

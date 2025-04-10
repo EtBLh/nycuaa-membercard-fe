@@ -7,6 +7,7 @@ export interface IMemberData {
   govid: string;
   email: string;
   phone?: string;
+  permit: boolean
 }
 
 interface MemberDataState {

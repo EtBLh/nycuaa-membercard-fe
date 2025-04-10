@@ -11,56 +11,70 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/utils';
 import { Spinner } from '@/components/ui/spinner';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { RootState } from '@/store';
+import { useSelector } from 'react-redux';
 
 const UploadIconForm = (props: {next: () => void}) => {
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [hasExistingIcon, setHasExistingIcon] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const fetchIcon = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get('/member/icon', {
+  const queryClient = useQueryClient();
+  const token = useSelector<RootState>(state => state.auth?.token);
+
+  const icon = useQuery({
+    queryKey: ['icon', token],
+    queryFn: () => {
+      return api.get('/member/icon', {
         responseType: 'blob', // for image blob
       });
-      setLoading(false);
+    },
+    retry: false // to prevent retry on res.status === 404
+  })
 
-      if (res.data && res.data.size > 0) {
-        const url = URL.createObjectURL(res.data);
-        setPreviewUrl(url);
-        setHasExistingIcon(true);
-      }
-    } catch (err) {
-      console.error('Error fetching icon:', err);
+  useEffect(() => {
+    if (icon.status === 'success' && icon.data && icon.data.data.size > 0) {
+      const url = URL.createObjectURL(icon.data.data);
+      setPreviewUrl(url);
+      setHasExistingIcon(true);
+    } else if (icon.status === 'error') {
+      console.error('Error fetching icon:', icon.error);
     }
-  };
-  useEffect(() => {fetchIcon()}, []);
+  }, [icon.data, icon.status])
 
-  const handleUpload = async () => {
-    if (!image) return;
-    const formData = new FormData();
-    formData.append('file', image);
-
-    try {
-      setLoading(true);
-      const res = await api.put('/member/icon', formData, {
+  const upload = useMutation({
+    mutationFn: (image: File | null) => {
+      if (!image) return Promise.reject('請選擇圖片');
+      const formData = new FormData();
+      formData.append('file', image);
+      return api.put('/member/icon', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setLoading(false);
-
+    },
+    onSuccess: (res) => {
       if (res.status === 200) {
-        console.log('Uploaded:', res.data);
         setHasExistingIcon(true);
-      } else {
-        console.error('Upload failed');
+        props.next();
+        queryClient.invalidateQueries({ queryKey: ['icon', token] })
       }
-    } catch (err) {
-      console.error('Upload error:', err);
+    },
+    onError: (err: AxiosError<{error: string}> | string) => {
+      if (typeof err === 'string') {
+        setErrorMessage('請選擇圖片');
+        return;
+      }
+      if (err.status === 413) {
+        setErrorMessage('圖片太大了(☉д⊙) 請上傳<10MB的圖片')
+      } else {
+        setErrorMessage('上傳圖片失敗(☉д⊙) :' +err.response?.data?.error)
+      }
     }
-  };
+  })
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -74,11 +88,10 @@ const UploadIconForm = (props: {next: () => void}) => {
     }
   };
 
-  const next = async () => {
-    if (image) {
-      await handleUpload();
-      props.next();
-    } else {
+  const handleNext = () => {
+    if (!hasExistingIcon || image) {
+      upload.mutate(image)
+    } else if (hasExistingIcon && !image) {
       props.next();
     }
   }
@@ -112,11 +125,23 @@ const UploadIconForm = (props: {next: () => void}) => {
               />
             </div>
           )}
-          <Button onClick={next} disabled={(!image && !hasExistingIcon) || loading}>
+          <Button onClick={handleNext} disabled={(!image && !hasExistingIcon) || icon.isLoading || upload.isPending}>
             {
-              loading ? <Spinner className='text-[black]' size={"small"}/> : "下一步"
+              !icon.isLoading && !upload.isPending && "下一步"
+            }
+            {
+              icon.isLoading && (
+                <div className='flex gap-2'>
+                  <Spinner className='text-[black]' size={"small"}/> 
+                  加載大頭照中
+                </div>
+              )
+            }
+            {
+              upload.isPending && <Spinner className='text-[black]' size={"small"}/> 
             }
           </Button>
+          {upload.error && errorMessage && <p className="text-sm text-destructive text-center">{errorMessage}</p>}
         </div>
       </CardContent>
     </Card>
