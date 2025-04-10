@@ -13,15 +13,12 @@ import { useQuery } from '@tanstack/react-query';
 import { IdCard } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { isMobile } from 'react-device-detect';
-import { useNavigate } from 'react-router-dom';
-
-// import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const DownloadMemberCardForm = () => {
 
     const dispatch = useDispatch();
     const token = useSelector((state: RootState) => state.auth?.token ?? '');
-    const navigate = useNavigate();
 
     const { data: member } = useQuery({
         queryKey: ['memberdata', token],
@@ -31,8 +28,9 @@ const DownloadMemberCardForm = () => {
 
     const logout = () => {
         dispatch(clearToken());
-        navigate('login')
     }
+
+    if (!token) return;
 
     return (
         <Card>
@@ -42,7 +40,7 @@ const DownloadMemberCardForm = () => {
                     <span>會員證製作成功!</span>
                 </CardTitle>
                 <CardDescription>
-                    會員證已寄到郵箱 {member.email}
+                    會員證已寄到 {member.email}
                 </CardDescription>
             </CardHeader>
             <CardContent className='flex flex-col w-full'>
@@ -58,7 +56,7 @@ const DownloadMemberCardForm = () => {
                         </Button>
                     </a>
                 </div>
-                {/* <Link to='/help' className='text-sm self-end mt-4 -mb-2' style={{textDecoration: 'underline'}}>無法加入到錢包？</Link> */}
+                <Link to='/help' className='text-sm self-end mt-4 -mb-2' style={{textDecoration: 'underline'}}>無法加入到錢包？</Link>
             </CardContent>
         </Card>
     );
