@@ -1,12 +1,16 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import HomePage from './page/home/index.tsx'
 import MemberCardPage from './page/membercard'
-import AdminPage from './page/admin'
-import CheckInPage from './page/checkIn'
 import LoginPage from "./page/login";
-import AdminLoginPage from "./page/admin/login";
 import HelpPage from "./page/help";
-import ProtectedRoute from "./components/ProtectedRoute.tsx";
+import AdminLoginPage from "./page/admin/login";
+import AdminPage from './page/admin/home'
+import AdminLayout from "./page/admin/layout"
+import AdminCheckInRecordPage from "./page/admin/checkin-record"
+import AdminBulkAddPage from "./page/admin/bulk-add"
+
+import CheckInPage from './page/admin/checkin/index'
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
 
@@ -28,7 +32,12 @@ function App() {
             <Route path='login' element={<AdminLoginPage />}/>
 
             <Route element={<ProtectedRoute isAdmin/>}>
-              <Route index element={<AdminPage />}/>
+              <Route element={<AdminLayout />}>
+                <Route path='home' element={<AdminPage />}/>
+                <Route path='checkin-record' element={<AdminCheckInRecordPage />}/>
+                <Route path='bulk-add' element={<AdminBulkAddPage />}/>
+                <Route path='conference/checkin' element={<CheckInPage />}/>
+              </Route>
             </Route>
           </Route>
 

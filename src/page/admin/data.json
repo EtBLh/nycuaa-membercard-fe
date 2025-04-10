@@ -1,0 +1,615 @@
+[
+    {
+      "id": 1,
+      "name": "Cover page",
+      "govid": "Cover page",
+      "status": "unpaid",
+      "type": "18",
+      "birthday": "5",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 2,
+      "name": "Table of contents",
+      "govid": "Table of contents",
+      "status": "paid",
+      "type": "29",
+      "birthday": "24",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 3,
+      "name": "Executive summary",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "10",
+      "birthday": "13",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 4,
+      "name": "Technical approach",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "27",
+      "birthday": "23",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 5,
+      "name": "Design",
+      "govid": "Narrative",
+      "status": "unpaid",
+      "type": "2",
+      "birthday": "16",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 6,
+      "name": "Capabilities",
+      "govid": "Narrative",
+      "status": "unpaid",
+      "type": "20",
+      "birthday": "8",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 7,
+      "name": "Integration with existing systems",
+      "govid": "Narrative",
+      "status": "unpaid",
+      "type": "19",
+      "birthday": "21",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 8,
+      "name": "Innovation and Advantages",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "25",
+      "birthday": "26",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 9,
+      "name": "Overview of EMR's Innovative Solutions",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "7",
+      "birthday": "23",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 10,
+      "name": "Advanced Algorithms and Machine Learning",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "30",
+      "birthday": "28",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 11,
+      "name": "Adaptive Communication Protocols",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "9",
+      "birthday": "31",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 12,
+      "name": "Advantages Over Current Technologies",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "12",
+      "birthday": "0",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 13,
+      "name": "Past Performance",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "22",
+      "birthday": "33",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 14,
+      "name": "Customer Feedback and Satisfaction Levels",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "15",
+      "birthday": "34",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 15,
+      "name": "Implementation Challenges and Solutions",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "3",
+      "birthday": "35",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 16,
+      "name": "Security Measures and Data Protection Policies",
+      "govid": "Narrative",
+      "status": "unpaid",
+      "type": "6",
+      "birthday": "36",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 17,
+      "name": "Scalability and Future Proofing",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "4",
+      "birthday": "37",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 18,
+      "name": "Cost-Benefit Analysis",
+      "govid": "Plain language",
+      "status": "paid",
+      "type": "14",
+      "birthday": "38",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 19,
+      "name": "User Training and Onboarding Experience",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "17",
+      "birthday": "39",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 20,
+      "name": "Future Development Roadmap",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "11",
+      "birthday": "40",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 21,
+      "name": "System Architecture Overview",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "24",
+      "birthday": "18",
+      "email": "Maya Johnson"
+    },
+    {
+      "id": 22,
+      "name": "Risk Management Plan",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "15",
+      "birthday": "22",
+      "email": "Carlos Rodriguez"
+    },
+    {
+      "id": 23,
+      "name": "Compliance Documentation",
+      "govid": "Legal",
+      "status": "unpaid",
+      "type": "31",
+      "birthday": "27",
+      "email": "Sarah Chen"
+    },
+    {
+      "id": 24,
+      "name": "API Documentation",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "8",
+      "birthday": "12",
+      "email": "Raj Patel"
+    },
+    {
+      "id": 25,
+      "name": "User Interface Mockups",
+      "govid": "Visual",
+      "status": "unpaid",
+      "type": "19",
+      "birthday": "25",
+      "email": "Leila Ahmadi"
+    },
+    {
+      "id": 26,
+      "name": "Database Schema",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "22",
+      "birthday": "20",
+      "email": "Thomas Wilson"
+    },
+    {
+      "id": 27,
+      "name": "Testing Methodology",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "17",
+      "birthday": "14",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 28,
+      "name": "Deployment Strategy",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "26",
+      "birthday": "30",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 29,
+      "name": "Budget Breakdown",
+      "govid": "Financial",
+      "status": "unpaid",
+      "type": "13",
+      "birthday": "16",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 30,
+      "name": "Market Analysis",
+      "govid": "Research",
+      "status": "paid",
+      "type": "29",
+      "birthday": "32",
+      "email": "Sophia Martinez"
+    },
+    {
+      "id": 31,
+      "name": "Competitor Comparison",
+      "govid": "Research",
+      "status": "unpaid",
+      "type": "21",
+      "birthday": "19",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 32,
+      "name": "Maintenance Plan",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "16",
+      "birthday": "23",
+      "email": "Alex Thompson"
+    },
+    {
+      "id": 33,
+      "name": "User Personas",
+      "govid": "Research",
+      "status": "unpaid",
+      "type": "27",
+      "birthday": "24",
+      "email": "Nina Patel"
+    },
+    {
+      "id": 34,
+      "name": "Accessibility Compliance",
+      "govid": "Legal",
+      "status": "paid",
+      "type": "18",
+      "birthday": "21",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 35,
+      "name": "Performance Metrics",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "23",
+      "birthday": "26",
+      "email": "David Kim"
+    },
+    {
+      "id": 36,
+      "name": "Disaster Recovery Plan",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "14",
+      "birthday": "17",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 37,
+      "name": "Third-party Integrations",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "25",
+      "birthday": "28",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 38,
+      "name": "User Feedback Summary",
+      "govid": "Research",
+      "status": "paid",
+      "type": "20",
+      "birthday": "15",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 39,
+      "name": "Localization Strategy",
+      "govid": "Narrative",
+      "status": "unpaid",
+      "type": "12",
+      "birthday": "19",
+      "email": "Maria Garcia"
+    },
+    {
+      "id": 40,
+      "name": "Mobile Compatibility",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "28",
+      "birthday": "31",
+      "email": "James Wilson"
+    },
+    {
+      "id": 41,
+      "name": "Data Migration Plan",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "19",
+      "birthday": "22",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 42,
+      "name": "Quality Assurance Protocols",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "30",
+      "birthday": "33",
+      "email": "Priya Singh"
+    },
+    {
+      "id": 43,
+      "name": "Stakeholder Analysis",
+      "govid": "Research",
+      "status": "unpaid",
+      "type": "11",
+      "birthday": "14",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 44,
+      "name": "Environmental Impact Assessment",
+      "govid": "Research",
+      "status": "paid",
+      "type": "24",
+      "birthday": "27",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 45,
+      "name": "Intellectual Property Rights",
+      "govid": "Legal",
+      "status": "unpaid",
+      "type": "17",
+      "birthday": "20",
+      "email": "Sarah Johnson"
+    },
+    {
+      "id": 46,
+      "name": "Customer Support Framework",
+      "govid": "Narrative",
+      "status": "paid",
+      "type": "22",
+      "birthday": "25",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 47,
+      "name": "Version Control Strategy",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "15",
+      "birthday": "18",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 48,
+      "name": "Continuous Integration Pipeline",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "26",
+      "birthday": "29",
+      "email": "Michael Chen"
+    },
+    {
+      "id": 49,
+      "name": "Regulatory Compliance",
+      "govid": "Legal",
+      "status": "unpaid",
+      "type": "13",
+      "birthday": "16",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 50,
+      "name": "User Authentication System",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "28",
+      "birthday": "31",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 51,
+      "name": "Data Analytics Framework",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "21",
+      "birthday": "24",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 52,
+      "name": "Cloud Infrastructure",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "16",
+      "birthday": "19",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 53,
+      "name": "Network Security Measures",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "29",
+      "birthday": "32",
+      "email": "Lisa Wong"
+    },
+    {
+      "id": 54,
+      "name": "Project Timeline",
+      "govid": "Planning",
+      "status": "paid",
+      "type": "14",
+      "birthday": "17",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 55,
+      "name": "Resource Allocation",
+      "govid": "Planning",
+      "status": "unpaid",
+      "type": "27",
+      "birthday": "30",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 56,
+      "name": "Team Structure and Roles",
+      "govid": "Planning",
+      "status": "paid",
+      "type": "20",
+      "birthday": "23",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 57,
+      "name": "Communication Protocols",
+      "govid": "Planning",
+      "status": "unpaid",
+      "type": "15",
+      "birthday": "18",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 58,
+      "name": "Success Metrics",
+      "govid": "Planning",
+      "status": "paid",
+      "type": "30",
+      "birthday": "33",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 59,
+      "name": "Internationalization Support",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "23",
+      "birthday": "26",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 60,
+      "name": "Backup and Recovery Procedures",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "18",
+      "birthday": "21",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 61,
+      "name": "Monitoring and Alerting System",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "25",
+      "birthday": "28",
+      "email": "Daniel Park"
+    },
+    {
+      "id": 62,
+      "name": "Code Review Guidelines",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "12",
+      "birthday": "15",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 63,
+      "name": "Documentation Standards",
+      "govid": "Technical content",
+      "status": "unpaid",
+      "type": "27",
+      "birthday": "30",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 64,
+      "name": "Release Management Process",
+      "govid": "Planning",
+      "status": "paid",
+      "type": "22",
+      "birthday": "25",
+      "email": "Assign reviewer"
+    },
+    {
+      "id": 65,
+      "name": "Feature Prioritization Matrix",
+      "govid": "Planning",
+      "status": "unpaid",
+      "type": "19",
+      "birthday": "22",
+      "email": "Emma Davis"
+    },
+    {
+      "id": 66,
+      "name": "Technical Debt Assessment",
+      "govid": "Technical content",
+      "status": "paid",
+      "type": "24",
+      "birthday": "27",
+      "email": "Eddie Lake"
+    },
+    {
+      "id": 67,
+      "name": "Capacity Planning",
+      "govid": "Planning",
+      "status": "unpaid",
+      "type": "21",
+      "birthday": "24",
+      "email": "Jamik Tashpulatov"
+    },
+    {
+      "id": 68,
+      "name": "Service Level Agreements",
+      "govid": "Legal",
+      "status": "paid",
+      "type": "26",
+      "birthday": "29",
+      "email": "Assign reviewer"
+    }
+  ]
+  

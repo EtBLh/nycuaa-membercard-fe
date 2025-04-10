@@ -16,18 +16,14 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 
 type LoginFormData = {
-  govid: string;
-  name: string;
-  code: string;
+  account: string;
+  password: string;
 };
 
 export default function LoginPage() {
-  const { register, handleSubmit, watch, setValue } = useForm<LoginFormData>();
-  const code = watch('code')
+  const { register, handleSubmit } = useForm<LoginFormData>();
   const [errorMessage, setErrorMessage] = useState('');
-  const [isVerifying, setVerify] = useState(false);
-  const [membermail, setMemberMail] = useState('');
-  
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const token = useSelector((state: RootState) => state.auth?.token);
@@ -39,7 +35,7 @@ export default function LoginPage() {
     },
     onSuccess: (res) => {
       if (res.status === 200) {
-        navigate('/home');
+        navigate('/admin/home');
       } else {
         dispatch(logout())
       }
@@ -56,16 +52,11 @@ export default function LoginPage() {
     }
   }, [token])
 
-  const { mutate: onLogin, isPending: loginLoading, error: loginError } = useMutation({
-    mutationFn: (data: LoginFormData) => api.post('/admin/login', {
-      govid: data.govid,
-      name: data.name
-    }),
+  const { mutate: onLogin, isPending: loading, error } = useMutation({
+    mutationFn: (data: LoginFormData) => api.post('/admin/login', data),
     onSuccess: (res) => {
       if (res.status === 200) {
-        setVerify(true);
-        setMemberMail(res.data.email)
-        setErrorMessage('');
+        dispatch(setToken(res.data.token))
       } else {
         setErrorMessage('資料庫查無此人(´ﾟдﾟ`)');
       }
@@ -79,32 +70,6 @@ export default function LoginPage() {
     }
   })
 
-  const { mutate: onVerify, isPending: verifyLoading, error: verifyError } = useMutation({
-    mutationFn: (data: LoginFormData) => api.post('/otp_verify', {
-      govid: data.govid,
-      name: data.name,
-      code: data.code
-    }),
-    onSuccess: (res) => {
-      if (res.status === 200) {
-        dispatch(setToken(res.data.token ?? ''));
-        navigate('/home');
-      } else {
-        setErrorMessage('OTP驗證碼不正確(´ﾟдﾟ`)');
-      }
-    },
-    onError: (err: AxiosError) => {
-      if (err.status === 401) {
-        setErrorMessage('驗證碼輸入錯誤');
-      } else {
-        setErrorMessage('哇系統出錯了(´ﾟдﾟ`)');
-      }
-    }
-  })
-
-  const loading = loginLoading || verifyLoading;
-  const error = loginError || verifyError;
-
   return <CardLayout>
     <Card>
       <CardHeader className="text-center">
@@ -113,31 +78,22 @@ export default function LoginPage() {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit((data) => isVerifying ? onVerify(data) : onLogin(data))}>
+        <form onSubmit={handleSubmit((data) => onLogin(data))}>
           <div className="grid gap-6">
-            {!isVerifying && (
-              <>
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Account</Label>
-                  <Input id="name" {...register('name')} />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="govid">Password</Label>
-                  <Input id="govid" {...register('govid')} />
-                </div>
-              </>
-            )}
+            <div className="grid gap-2">
+              <Label htmlFor="account">Account</Label>
+              <Input id="account" {...register('account')} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type='password' {...register('password')} />
+            </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {
                 loading ? <Spinner className='text-[black]' size={"small"} /> : 'Login'
               }
             </Button>
             {error && errorMessage && <p className="text-sm text-destructive text-center">{errorMessage}</p>}
-            <div className="text-right text-sm">
-              <Link to="/login" className="underline underline-offset-4">
-                會員按這𥚃！
-              </Link>
-            </div>
           </div>
         </form>
       </CardContent>
