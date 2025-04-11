@@ -1,23 +1,3 @@
-import * as React from "react"
-import {
-  DndContext,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type UniqueIdentifier,
-} from "@dnd-kit/core"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
-import {
-  SortableContext,
-  arrayMove,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 import {
   IconChevronDown,
   IconChevronLeft,
@@ -26,51 +6,24 @@ import {
   IconChevronsRight,
   IconCircleCheckFilled,
   IconDotsVertical,
-  IconGripVertical,
   IconLayoutColumns,
-  IconLoader,
-  IconPlus,
-  IconTrendingUp,
+  IconPlus
 } from "@tabler/icons-react"
 import {
   ColumnDef,
   ColumnFiltersState,
-  Row,
-  SortingState,
   VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
+  useReactTable
 } from "@tanstack/react-table"
-import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { toast } from "sonner"
+import * as React from "react"
 import { z } from "zod"
 
-import { useIsMobile } from "@/hooks/use-mobile"
+import logo from '@/assets/logo.png'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
 import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer"
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -79,7 +32,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { SearchInput } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import {
   Select,
@@ -88,7 +46,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
 import {
   Table,
   TableBody,
@@ -97,272 +54,235 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs"
+import { IMemberData } from "@/lib/types"
+import { api } from "@/lib/utils"
+import { selectToken } from "@/redux/authSlice"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { Ban, IdCard, Mail, Rabbit, User, Users } from "lucide-react"
+import { QRCodeSVG } from 'qrcode.react'
+import { useSelector } from "react-redux"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { AxiosError } from "axios"
 
 export const schema = z.object({
   id: z.number(),
   name: z.string(),
   govid: z.string(),
-  status: z.string(),
+  permit: z.boolean(),
   type: z.string(),
   birthday: z.string(),
   email: z.string(),
   phone: z.string(),
+  qrcode: z.string(),
+  card_created: z.boolean(),
+  icon_uploaded: z.boolean()
 })
 
-// Create a separate component for the drag handle
-function DragHandle({ id }: { id: number }) {
-  const { attributes, listeners } = useSortable({
-    id,
+
+export function DataTable() {
+
+  const setMemberPaid = useMutation({
+    mutationFn: (id: number) => api.post(`/admin/member/${id}/set-paid`, {paid: true}),
+    onSuccess: () => {
+      alert('success');
+      refetchMemberList();
+    },
+    onError: () => {
+      alert('failed D:')
+    }
   })
 
-  return (
-    <Button
-      {...attributes}
-      {...listeners}
-      variant="ghost"
-      size="icon"
-      className="text-muted-foreground size-7 hover:bg-transparent"
-    >
-      <IconGripVertical className="text-muted-foreground size-3" />
-      <span className="sr-only">Drag to reorder</span>
-    </Button>
-  )
-}
-
-const columns: ColumnDef<z.infer<typeof schema>>[] = [
-  {
-    id: "drag",
-    header: () => null,
-    cell: ({ row }) => <DragHandle id={row.original.id} />,
-  },
-  {
-    id: "select",
-    header: ({ table }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && "indeterminate")
+  const columns: ColumnDef<z.infer<typeof schema>>[] = React.useMemo(() => [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+            aria-label="Select all"
+          />
+        </div>
+      ),
+      cell: ({ row }) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        </div>
+      ),
+      enableSorting: false,
+      enableHiding: false,
+    },
+    {
+      accessorKey: "id",
+      header: "Member ID",
+      enableHiding: false,
+    },
+    {
+      accessorKey: "type",
+      header: "Type",
+      cell: ({ row }) => (
+        <Badge variant={row.original.type === 'founding' ? 'secondary' : 'outline'}>
+          {row.original.type === 'normal' && <User />}
+          {row.original.type === 'group' && <Users />}
+          {row.original.type === 'founding' && <Rabbit />}
+          {
+            row.original.type
           }
-          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-          aria-label="Select all"
-        />
-      </div>
-    ),
-    cell: ({ row }) => (
-      <div className="flex items-center justify-center">
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-        />
-      </div>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "name",
-    header: "Name",
-    enableHiding: false,
-  },
-  {
-    accessorKey: "govid",
-    header: "Government ID",
-    cell: ({ row }) => (
-      <div className="w-32">
-        {row.original.govid}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "status",
-    header: "Status",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground px-1.5">
-        {row.original.status === "paid" ? (
-          <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-        ) : (
-          <IconLoader />
-        )}
-        {row.original.status}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "target",
-    header: () => <div className="w-full text-right">Target</div>,
-    cell: ({ row }) => (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
-            success: "Done",
-            error: "Error",
-          })
-        }}
-      >
-        <Label htmlFor={`${row.original.id}-target`} className="sr-only">
-          Target
-        </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.target}
-          id={`${row.original.id}-target`}
-        />
-      </form>
-    ),
-  },
-  {
-    accessorKey: "limit",
-    header: () => <div className="w-full text-right">Limit</div>,
-    cell: ({ row }) => (
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          toast.promise(new Promise((resolve) => setTimeout(resolve, 1000)), {
-            loading: `Saving ${row.original.header}`,
-            success: "Done",
-            error: "Error",
-          })
-        }}
-      >
-        <Label htmlFor={`${row.original.id}-limit`} className="sr-only">
-          Limit
-        </Label>
-        <Input
-          className="hover:bg-input/30 focus-visible:bg-background dark:hover:bg-input/30 dark:focus-visible:bg-input/30 h-8 w-16 border-transparent bg-transparent text-right shadow-none focus-visible:border dark:bg-transparent"
-          defaultValue={row.original.limit}
-          id={`${row.original.id}-limit`}
-        />
-      </form>
-    ),
-  },
-  {
-    accessorKey: "reviewer",
-    header: "Reviewer",
-    cell: ({ row }) => {
-      const isAssigned = row.original.reviewer !== "Assign reviewer"
-
-      if (isAssigned) {
-        return row.original.reviewer
-      }
-
-      return (
-        <>
-          <Label htmlFor={`${row.original.id}-reviewer`} className="sr-only">
-            Reviewer
-          </Label>
-          <Select>
-            <SelectTrigger
-              className="w-38 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate"
-              size="sm"
-              id={`${row.original.id}-reviewer`}
-            >
-              <SelectValue placeholder="Assign reviewer" />
-            </SelectTrigger>
-            <SelectContent align="end">
-              <SelectItem value="Eddie Lake">Eddie Lake</SelectItem>
-              <SelectItem value="Jamik Tashpulatov">
-                Jamik Tashpulatov
-              </SelectItem>
-            </SelectContent>
-          </Select>
-        </>
+        </Badge>
       )
     },
-  },
-  {
-    id: "actions",
-    cell: () => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-            size="icon"
-          >
-            <IconDotsVertical />
-            <span className="sr-only">Open menu</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-32">
-          <DropdownMenuItem>Edit</DropdownMenuItem>
-          <DropdownMenuItem>Set as paid</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    ),
-  },
-]
+    {
+      accessorKey: "name",
+      header: "Name",
+      enableHiding: false,
+    },
+    {
+      accessorKey: "govid",
+      header: "Government ID",
+    },
+    {
+      accessorKey: "email",
+      header: "Email"
+    },
+    {
+      accessorKey: "phone",
+      header: "Phone",
+    },
+    {
+      accessorKey: "qrcode",
+      header: "QRCode",
+      cell: (param) => (
+        <HoverCard>
+          <HoverCardTrigger>
+            <Badge variant='outline'>hover to show</Badge>
+          </HoverCardTrigger>
+          <HoverCardContent className="flex flex-col w-[200px] items-center">
+            <span className="text-sm opacity-[0.8] mb-4 flex justify-center items-center">
+              <img src={logo} alt="NYCU logo" width={24} height={24} />
+              <span className="ml-1 mr-2">NYCUAA</span>
+              <span>{param.row.original.name}</span>
+            </span>
+            <QRCodeSVG value={param.row.original.qrcode} bgColor="#0f172b" fgColor="#f8fafc" />
+            <span className="text-xs opacity-[0.8]">{param.row.original.id}</span>
+          </HoverCardContent>
+        </HoverCard>
+      )
+    },
+    {
+      accessorKey: "permit",
+      header: "Status",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {row.original.permit ? (
+            <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+          ) : (
+            <Ban />
+          )}
+          {
+            row.original.permit ? 'paid' : 'unpaid'
+          }
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "icon_uploaded",
+      header: "icon?",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {row.original.icon_uploaded ? (
+            <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+          ) : (
+            <Ban />
+          )}
+          {
+            row.original.icon_uploaded ? 'yes' : 'no'
+          }
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "card_created",
+      header: "pass?",
+      cell: ({ row }) => (
+        <Badge variant="outline" className="text-muted-foreground px-1.5">
+          {row.original.card_created ? (
+            <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
+          ) : (
+            <Ban />
+          )}
+          {
+            row.original.card_created ? 'yes' : 'no'
+          }
+        </Badge>
+      ),
+    },
+    {
+      id: "actions",
+      cell: ({row}) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
+              size="icon"
+            >
+              <IconDotsVertical />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-32">
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem onClick={() =>setMemberPaid.mutate(row.original.id)}>Set as paid</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ], [])
 
-function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
-  const { transform, transition, setNodeRef, isDragging } = useSortable({
-    id: row.original.id,
-  })
+  const token = useSelector(selectToken);
 
-  return (
-    <TableRow
-      data-state={row.getIsSelected() && "selected"}
-      data-dragging={isDragging}
-      ref={setNodeRef}
-      className="relative z-0 data-[dragging=true]:z-10 data-[dragging=true]:opacity-80"
-      style={{
-        transform: CSS.Transform.toString(transform),
-        transition: transition,
-      }}
-    >
-      {row.getVisibleCells().map((cell) => (
-        <TableCell key={cell.id}>
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </TableCell>
-      ))}
-    </TableRow>
-  )
-}
-
-export function DataTable({
-  data: initialData,
-}: {
-  data: z.infer<typeof schema>[]
-}) {
-  const [data, setData] = React.useState(() => initialData)
-  const [rowSelection, setRowSelection] = React.useState({})
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const searchValue = columnFilters.find(f => f.id === 'search')?.value || ''
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
     pageSize: 10,
   })
-  const sortableId = React.useId()
-  const sensors = useSensors(
-    useSensor(MouseSensor, {}),
-    useSensor(TouchSensor, {}),
-    useSensor(KeyboardSensor, {})
-  )
 
-  const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ id }) => id) || [],
-    [data]
-  )
+  const { data, isLoading: loading, refetch: refetchMemberList } = useQuery({
+    queryKey: ['memberlist', token, pagination.pageIndex, pagination.pageSize, searchValue],
+    queryFn: () =>
+      api.get<{ members: IMemberData[]; total: number }>('/admin/members', {
+        params: {
+          page: pagination.pageIndex,
+          pagesize: pagination.pageSize,
+          search: searchValue,
+        },
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+    select: res => res.data
+  })
+
+  const [rowSelection, setRowSelection] = React.useState({})
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({})
+
 
   const table = useReactTable({
-    data,
+    data: data?.members ?? [],
+    //@ts-ignore
     columns,
     state: {
-      sorting,
       columnVisibility,
       rowSelection,
       columnFilters,
@@ -371,64 +291,82 @@ export function DataTable({
     getRowId: (row) => row.id.toString(),
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+    manualPagination: true,
+    pageCount: Math.ceil((data?.total ?? 0) / pagination.pageSize),
+
+    manualFiltering: true,
+    manualSorting: true,
   })
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event
-    if (active && over && active.id !== over.id) {
-      setData((data) => {
-        const oldIndex = dataIds.indexOf(active.id)
-        const newIndex = dataIds.indexOf(over.id)
-        return arrayMove(data, oldIndex, newIndex)
-      })
+  const invitationLetter = useMutation({
+    mutationFn: (memberIds: string[]) => api.post(`/admin/send-invitation-letter`, { member_ids: memberIds }),
+    onSuccess: (res) => {
+      alert('success: ' + JSON.stringify(res.data))
+    },
+    onError: (err: AxiosError<{error: string}>) => {
+      alert('error:'+ err.response?.data.error)
     }
+  })
+
+  const sendInvitationLetter = () => {
+    invitationLetter.mutate(Object.keys(rowSelection));
+  }
+
+  const updateMemberCard = useMutation({
+    mutationFn: (memberIds: string[]) => api.post(`/admin/update-member-card`, { member_ids: memberIds }),
+    onSuccess: (res) => {
+      alert('succcess ' + JSON.stringify(res.data));
+    },
+    onError: (err: AxiosError<{error: string}>) => {
+      alert('error:'+ err.response?.data.error)
+    }
+  })
+
+  const sendUpdatedMemberCard = () => {
+    updateMemberCard.mutate(Object.keys(rowSelection));
   }
 
   return (
-    <Tabs
-      defaultValue="outline"
-      className="w-full flex-col justify-start gap-6"
-    >
-      <div className="flex items-center justify-between px-4 lg:px-6">
-        <Label htmlFor="view-selector" className="sr-only">
-          View
-        </Label>
-        <Select defaultValue="outline">
-          <SelectTrigger
-            className="flex w-fit @4xl/main:hidden"
-            size="sm"
-            id="view-selector"
-          >
-            <SelectValue placeholder="Select a view" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            <SelectItem value="paid">Paid</SelectItem>
-            <SelectItem value="unpaid">Not Paid</SelectItem>
-          </SelectContent>
-        </Select>
-        <TabsList className="**:data-[slot=badge]:bg-muted-foreground/30 hidden **:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:px-1 @4xl/main:flex">
-          <TabsTrigger value="all">All Member</TabsTrigger>
-          <TabsTrigger value="paid">
-            Paid
-          </TabsTrigger>
-          <TabsTrigger value="unpaid">
-            Not Paid
-          </TabsTrigger>
-        </TabsList>
-        <div className="flex items-center gap-2">
+    <div className="w-full flex-col justify-start gap-6">
+      <div className="flex items-center justify-between px-4 lg:px-6 flex-wrap lg:flex-nowrap">
+        <div className="flex items-center w-full md:w-auto gap-2">
+          <SearchInput
+            className="md:w-[240px]"
+            placeholder="Search by name/govid/member_id"
+            value={columnFilters.find(colf => colf.id === 'search')?.value as string ?? ''}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setColumnFilters([{ id: 'search', value: e.target?.value ?? '' }])
+            }
+          />
+          {/* <Select>
+            <SelectTrigger>
+              <Funnel /><SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="paid">paid</SelectItem>
+              <SelectItem value="unpaid">unpaid</SelectItem>
+              <SelectItem value="clear">cancel</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger>
+              <Funnel /><SelectValue placeholder="Type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="founding">founding</SelectItem>
+              <SelectItem value="normal">normal</SelectItem>
+              <SelectItem value="group">group</SelectItem>
+              <SelectItem value="clear">cancel</SelectItem>
+            </SelectContent>
+          </Select> */}
+        </div>
+        <div className="flex items-center gap-2 w-full md:w-auto">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild >
               <Button variant="outline" size="sm">
                 <IconLayoutColumns />
                 <span className="hidden lg:inline">Customize Columns</span>
@@ -460,66 +398,83 @@ export function DataTable({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button size="sm">
+          <Button size="sm" onClick={() => alert('not implemented')}>
             <IconPlus />
             <span className="hidden lg:inline">Add New Member</span>
           </Button>
+          <Tooltip>
+            <TooltipContent>Send Updated MemberCard(by email)</TooltipContent>
+            <TooltipTrigger>
+              <Button size="sm" onClick={sendUpdatedMemberCard}>
+                <IdCard />
+              </Button>
+            </TooltipTrigger>
+          </Tooltip>
+          <Tooltip>
+            <TooltipContent>Send Invitation Letter</TooltipContent>
+            <TooltipTrigger>
+              <Button size="sm" onClick={sendInvitationLetter}>
+                <Mail />
+              </Button>
+            </TooltipTrigger>
+          </Tooltip>
         </div>
       </div>
-      <TabsContent
-        value="all"
-        className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6"
-      >
+      <div className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6 mt-4">
         <div className="overflow-hidden rounded-lg border">
-          <DndContext
-            collisionDetection={closestCenter}
-            modifiers={[restrictToVerticalAxis]}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}
-            id={sortableId}
-          >
-            <Table>
-              <TableHeader className="bg-muted sticky top-0 z-10">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => {
-                      return (
-                        <TableHead key={header.id} colSpan={header.colSpan}>
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      )
-                    })}
-                  </TableRow>
-                ))}
-              </TableHeader>
-              <TableBody className="**:data-[slot=table-cell]:first:w-8">
-                {table.getRowModel().rows?.length ? (
-                  <SortableContext
-                    items={dataIds}
-                    strategy={verticalListSortingStrategy}
+          <Table>
+            <TableHeader className="bg-muted sticky top-0 z-10">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id} colSpan={header.colSpan}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                      </TableHead>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody className="**:data-[slot=table-cell]:first:w-8">
+              {
+                loading && 'Loading...'
+              }
+              {table.getRowModel().rows?.length && (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    data-state={row.getIsSelected() && "selected"}
+                    className="relative"
                   >
-                    {table.getRowModel().rows.map((row) => (
-                      <DraggableRow key={row.id} row={row} />
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
                     ))}
-                  </SortableContext>
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
-                      No results.
-                    </TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </DndContext>
+                ))
+              )}
+              {
+                !loading && !table.getRowModel().rows.length && (
+                  (
+                    <TableRow>
+                      <TableCell
+                        colSpan={columns.length}
+                        className="h-24 text-center"
+                      >
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )
+                )
+              }
+            </TableBody>
+          </Table>
         </div>
         <div className="flex items-center justify-between px-4">
           <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
@@ -598,22 +553,7 @@ export function DataTable({
             </div>
           </div>
         </div>
-      </TabsContent>
-      <TabsContent
-        value=""
-        className="flex flex-col px-4 lg:px-6"
-      >
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-      <TabsContent value="key-personnel" className="flex flex-col px-4 lg:px-6">
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-      <TabsContent
-        value="focus-documents"
-        className="flex flex-col px-4 lg:px-6"
-      >
-        <div className="aspect-video w-full flex-1 rounded-lg border border-dashed"></div>
-      </TabsContent>
-    </Tabs>
+      </div>
+    </div>
   )
 }

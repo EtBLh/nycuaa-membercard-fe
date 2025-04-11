@@ -6,9 +6,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { ScanQrCode, UsersIcon } from "lucide-react"
+import { ScanQrCode, ScrollText, UserCog, UserPlus, UsersIcon } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
-
 
 const memberBtns = [
   {
@@ -18,8 +17,13 @@ const memberBtns = [
   },
   {
     title: 'Bulk Add',
-    icon: UsersIcon,
+    icon: UserPlus,
     to: '/admin/bulk-add'
+  },
+  {
+    title: 'Bulk Edit',
+    icon: UserCog,
+    to: '/admin/bulk-edit'
   },
 ]
 
@@ -31,7 +35,7 @@ const checkInBtns = [
   },
   {
     title: 'Check-in record',
-    icon: ScanQrCode,
+    icon: ScrollText,
     to: '/admin/checkin-record'
   },
 ]

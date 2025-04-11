@@ -1,15 +1,6 @@
 import { RootState } from '@/store';
 import { createSlice } from '@reduxjs/toolkit';
 
-export interface IMemberData {
-  id: string;
-  name: string;
-  govid: string;
-  email: string;
-  phone?: string;
-  permit: boolean
-}
-
 interface MemberDataState {
   step: number;
 }

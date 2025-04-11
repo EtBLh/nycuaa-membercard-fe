@@ -8,8 +8,9 @@ import AdminPage from './page/admin/home'
 import AdminLayout from "./page/admin/layout"
 import AdminCheckInRecordPage from "./page/admin/checkin-record"
 import AdminBulkAddPage from "./page/admin/bulk-add"
-
-import CheckInPage from './page/admin/checkin/index'
+import AdminBulkEditPage from "./page/admin/bulk-edit"
+import CheckInPage from './page/admin/checkin'
+import CheckInRecordPage from './page/admin/checkin-record'
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -33,10 +34,13 @@ function App() {
 
             <Route element={<ProtectedRoute isAdmin/>}>
               <Route element={<AdminLayout />}>
+                <Route index element={<Navigate to='/admin/home' />}/>
                 <Route path='home' element={<AdminPage />}/>
                 <Route path='checkin-record' element={<AdminCheckInRecordPage />}/>
                 <Route path='bulk-add' element={<AdminBulkAddPage />}/>
+                <Route path='bulk-edit' element={<AdminBulkEditPage />}/>
                 <Route path='conference/checkin' element={<CheckInPage />}/>
+                <Route path='conference/checkin-record' element={<CheckInRecordPage />}/>
               </Route>
             </Route>
           </Route>
