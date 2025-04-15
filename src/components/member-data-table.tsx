@@ -331,16 +331,12 @@ export function DataTable() {
     updateMemberCard.mutate(Object.keys(rowSelection));
   }
 
-  const addNewMember = () => {
-
-  }
-
   return (
     <div className="w-full flex-col justify-start gap-6">
       <div className="flex items-center justify-between px-4 lg:px-6 flex-wrap lg:flex-nowrap">
         <div className="flex items-center w-full md:w-auto gap-2">
           <SearchInput
-            className="md:w-[240px]"
+            className="md:w-[280px]"
             placeholder="Search by name/govid/member_id"
             value={columnFilters.find(colf => colf.id === 'search')?.value as string ?? ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -403,7 +399,7 @@ export function DataTable() {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <AddMemberDialog />
+          <AddMemberDialog refetch={refetchMemberList}/>
           <Tooltip>
             <TooltipContent>Send Updated MemberCard(by email)</TooltipContent>
             <TooltipTrigger>
