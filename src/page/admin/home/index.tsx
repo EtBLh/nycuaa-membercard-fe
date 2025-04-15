@@ -1,4 +1,4 @@
-import { DataTable } from "../components/member-data-table"
+import { DataTable } from "../../../components/member-data-table"
 
 export default function Page() {
 

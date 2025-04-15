@@ -63,8 +63,9 @@ import { QRCodeSVG } from 'qrcode.react'
 import { useSelector } from "react-redux"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { AxiosError } from "axios"
+import AddMemberDialog from "./add-member-dialog"
 
-export const schema = z.object({
+export const MemberFullSchema = z.object({
   id: z.number(),
   name: z.string(),
   govid: z.string(),
@@ -92,7 +93,7 @@ export function DataTable() {
     }
   })
 
-  const columns: ColumnDef<z.infer<typeof schema>>[] = React.useMemo(() => [
+  const columns: ColumnDef<z.infer<typeof MemberFullSchema>>[] = React.useMemo(() => [
     {
       id: "select",
       header: ({ table }) => (
@@ -330,6 +331,10 @@ export function DataTable() {
     updateMemberCard.mutate(Object.keys(rowSelection));
   }
 
+  const addNewMember = () => {
+
+  }
+
   return (
     <div className="w-full flex-col justify-start gap-6">
       <div className="flex items-center justify-between px-4 lg:px-6 flex-wrap lg:flex-nowrap">
@@ -398,10 +403,7 @@ export function DataTable() {
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button size="sm" onClick={() => alert('not implemented')}>
-            <IconPlus />
-            <span className="hidden lg:inline">Add New Member</span>
-          </Button>
+          <AddMemberDialog />
           <Tooltip>
             <TooltipContent>Send Updated MemberCard(by email)</TooltipContent>
             <TooltipTrigger>

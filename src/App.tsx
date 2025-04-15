@@ -12,6 +12,7 @@ import AdminBulkEditPage from "./page/admin/bulk-edit"
 import CheckInPage from './page/admin/checkin'
 import CheckInRecordPage from './page/admin/checkin-record'
 import ProtectedRoute from "./components/ProtectedRoute";
+import { Toaster } from "@/components/ui/sonner"
 
 function App() {
 
@@ -48,6 +49,7 @@ function App() {
           
         </Routes>
       </BrowserRouter>
+      <Toaster />
     </div>
   )
 }
