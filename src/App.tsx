@@ -8,7 +8,6 @@ import AdminPage from './page/admin/home'
 import AdminLayout from "./page/admin/layout"
 import AdminCheckInRecordPage from "./page/admin/checkin-record"
 import AdminBulkAddPage from "./page/admin/bulk-add"
-import AdminBulkEditPage from "./page/admin/bulk-edit"
 import CheckInPage from './page/admin/checkin'
 import CheckInRecordPage from './page/admin/checkin-record'
 import ProtectedRoute from "./components/ProtectedRoute";
