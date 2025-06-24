@@ -39,7 +39,6 @@ function App() {
                 <Route path='home' element={<AdminPage />}/>
                 <Route path='checkin-record' element={<AdminCheckInRecordPage />}/>
                 <Route path='bulk-add' element={<AdminBulkAddPage />}/>
-                <Route path='bulk-edit' element={<AdminBulkEditPage />}/>
                 <Route path='conference/checkin' element={<CheckInPage />}/>
                 <Route path='conference/checkin-record' element={<CheckInRecordPage />}/>
               </Route>

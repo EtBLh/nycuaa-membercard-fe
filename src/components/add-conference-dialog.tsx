@@ -15,24 +15,17 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { api, cn } from "@/lib/utils";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { IconPlus } from "@tabler/icons-react";
 import { useMutation } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
-import { toast } from "sonner"
-import { AxiosError } from "axios";
 
 export const ConferenceSchema = z.object({
     name: z.string(),
