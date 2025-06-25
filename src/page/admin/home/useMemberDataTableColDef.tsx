@@ -26,7 +26,7 @@ import {
 import { Ban, Rabbit, User, Users } from "lucide-react"
 import { QRCodeSVG } from 'qrcode.react'
 import { MemberFullSchema } from "./memberDataTable"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { api } from "@/lib/utils"
 import { useEffect, useRef, useState, useMemo } from "react"
 import { Spinner } from "@/components/ui/spinner"
@@ -42,7 +42,6 @@ type EditableCellProps = {
 const EditableCell: React.FC<EditableCellProps> = ({ field, memberId, value: initialValue }) => {
 
     const prevValue = useRef(initialValue);
-    // const queryClient = useQueryClient()
 
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(prevValue.current);   
@@ -122,6 +121,17 @@ const useMemberDataTableColDef = (refetch: () => void) => {
             toast.error('failed D:')
         }
     })
+
+    const deleteMemberMutation = useMutation({
+        mutationFn: (id: number) => api.delete(`/admin/member/${id}`),
+        onSuccess: () => {
+            toast.success('Member deleted successfully');
+            refetch();
+        },
+        onError: () => {
+            toast.error('Failed to delete member');
+        }
+    });
 
     const columns: ColumnDef<z.infer<typeof MemberFullSchema>>[] = useMemo(() => [
         {
@@ -303,7 +313,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
                                 Set as {row.original.permit ? 'unpaid' : 'paid'}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+                        <DropdownMenuItem variant="destructive" onClick={() => deleteMemberMutation.mutate(row.original.id)}>Delete</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             ),

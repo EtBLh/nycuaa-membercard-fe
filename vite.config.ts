@@ -12,6 +12,6 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ['dev-nycuaamembercard.lkc404.me']
+    allowedHosts: ['dev-nycuaamembercard.lkc404.me', 'hugo.vm']
   }
 })

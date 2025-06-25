@@ -43,6 +43,7 @@ import { useSelector } from "react-redux"
 import AddMemberDialog from "./addMemberDialog"
 import useMemberDataTableColDef from "./useMemberDataTableColDef"
 import { useEffect } from "react"
+import SendEmailDialog from "./sendEmailDialog"
 
 export const MemberFullSchema = z.object({
   id: z.number(),
@@ -86,7 +87,6 @@ export function DataTable() {
           pagesize: pagination.pageSize,
           search: searchValue,
         },
-        headers: { Authorization: `Bearer ${token}` },
       }),
     select: res => res.data
   })
@@ -122,20 +122,6 @@ export function DataTable() {
     manualSorting: true,
   })
 
-  const sendMemberCardMutation = useMutation({
-    mutationFn: (memberIds: string[]) => api.post(`/admin/send-member-card`, { member_ids: memberIds }),
-    onSuccess: (res) => {
-      alert('succcess ' + JSON.stringify(res.data));
-    },
-    onError: (err: AxiosError<{error: string}>) => {
-      alert('error:'+ err.response?.data.error)
-    }
-  })
-
-  const sendMemberCard = () => {
-    sendMemberCardMutation.mutate(Object.keys(rowSelection));
-  }
-
   return (
     <div className="w-full flex-col justify-start gap-6">
       <div className="flex items-center justify-between px-4 lg:px-6 flex-wrap lg:flex-nowrap">
@@ -151,14 +137,7 @@ export function DataTable() {
         </div>
         <div className="flex items-center gap-2 w-full md:w-auto">
           <AddMemberDialog refetch={refetch}/>
-          <Tooltip>
-            <TooltipContent>Send Updated MemberCard(by email)</TooltipContent>
-            <TooltipTrigger>
-              <Button size="sm" onClick={sendMemberCard} disabled={!Object.keys(rowSelection).length}>
-                <IdCard />
-              </Button>
-            </TooltipTrigger>
-          </Tooltip>
+          <SendEmailDialog refetch={refetch} rowSelection={rowSelection}/>
         </div>
       </div>
       <div className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6 mt-4">
@@ -239,7 +218,7 @@ export function DataTable() {
                   />
                 </SelectTrigger>
                 <SelectContent side="top">
-                  {[20, 50, 100].map((pageSize) => (
+                  {[15, 50, 100].map((pageSize) => (
                     <SelectItem key={pageSize} value={`${pageSize}`}>
                       {pageSize}
                     </SelectItem>

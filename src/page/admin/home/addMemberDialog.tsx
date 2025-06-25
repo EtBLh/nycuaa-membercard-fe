@@ -4,6 +4,7 @@ import { Calendar } from "@/components/ui/calendar";
 import {
     Dialog,
     DialogContent,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger
@@ -159,12 +160,12 @@ const AddMemberDialog = (props: {
                                 </FormItem>
                             )}
                         />
-                        <div className="flex flex-row items-start justify-between">
+                        <div className="flex flex-row items-start justify-between gap-2">
                             <FormField
                                 control={form.control}
                                 name="birthday"
                                 render={({ field }) => (
-                                    <FormItem className="flex flex-col flex-1">
+                                    <FormItem className="flex flex-col flex-2">
                                         <FormLabel>Date of birth</FormLabel>
                                         <Popover>
                                             <PopoverTrigger asChild>
@@ -205,11 +206,11 @@ const AddMemberDialog = (props: {
                                 control={form.control}
                                 name="type"
                                 render={({ field }) => (
-                                    <FormItem>
+                                    <FormItem className="flex-1">
                                         <FormLabel>Type</FormLabel>
                                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                                             <FormControl>
-                                                <SelectTrigger>
+                                                <SelectTrigger className='w-full'>
                                                     <SelectValue placeholder="member type" />
                                                 </SelectTrigger>
                                             </FormControl>
@@ -224,9 +225,9 @@ const AddMemberDialog = (props: {
                                 )}
                             />
                         </div>
-                        <div className="flex flex-row justify-end">
-                            <Button type="submit" disabled={addMember.isPending}>Submit</Button>
-                        </div>
+                        <DialogFooter>
+                            <Button className="w-full" type="submit" disabled={addMember.isPending}>Submit</Button>
+                        </DialogFooter>
                     </form>
                 </Form>
             </DialogContent>

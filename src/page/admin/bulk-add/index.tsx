@@ -31,6 +31,60 @@ export const MemberMinimalSchema = z.object({
     phone: z.string()
 })
 
+// Reusable EditableCell component with placeholder support
+function EditableCell({
+  row,
+  column,
+  getValue,
+  editing,
+  editValue,
+  setEditing,
+  setEditValue,
+  setData,
+  data,
+  type = "text",
+  placeholder = "",
+}: {
+  row: any
+  column: string
+  getValue: () => any
+  editing: { row: number; column: string } | null
+  editValue: string
+  setEditing: React.Dispatch<React.SetStateAction<{ row: number; column: string } | null>>
+  setEditValue: React.Dispatch<React.SetStateAction<string>>
+  setData: React.Dispatch<React.SetStateAction<any[]>>
+  data: any[]
+  type?: string
+  placeholder?: string
+}) {
+  const value = getValue()
+  return editing?.row === row.index && editing?.column === column ? (
+    <input
+      type={type}
+      value={editValue}
+      onChange={e => setEditValue(e.target.value)}
+      onBlur={() => {
+        const newData = [...data]
+        newData[row.index][column] = type === "number" ? Number(editValue) : editValue
+        setData(newData)
+        setEditing(null)
+      }}
+      autoFocus
+      className="border px-2 py-1 rounded w-full"
+      placeholder={placeholder}
+    />
+  ) : (
+    <span
+      className={`w-full cursor-pointer block min-w-10 min-h-4 ${value === "" ? "text-muted-foreground" : ""}`}
+      onClick={() => {
+        setEditing({ row: row.index, column })
+        setEditValue(value)
+      }}
+    >
+      {value === "" || value === undefined || value === null ? placeholder : value}
+    </span>
+  )
+}
 
 export default function Page() {
     // Sample data for demonstration
@@ -43,11 +97,10 @@ export default function Page() {
     // useMutation for saving data
     const saveMutation = useMutation({
         mutationFn: async (members: typeof data) => {
-            // Replace with your actual API endpoint
-            console.log(members)
-            return api.post("/your-endpoint/bulk-save", members)
+            return api.post(`/admin/member/add`, [...members ]);
         },
         onSuccess: () => {
+            setData([]);
             toast.success("All members saved successfully.")
         },
         onError: (error: AxiosError) => {
@@ -62,36 +115,24 @@ export default function Page() {
                 accessorKey: "id",
                 header: "ID",
                 cell: ({ row, getValue }: any) =>
-                    editing?.row === row.index && editing?.column === "id" ? (
-                        <input
-                            type="number"
-                            value={editValue}
-                            onChange={e => setEditValue(e.target.value)}
-                            onBlur={() => {
-                                const newData = [...data]
-                                newData[row.index].id = Number(editValue)
-                                setData(newData)
-                                setEditing(null)
-                            }}
-                            autoFocus
-                            className="border px-2 py-1 rounded w-full"
-                        />
-                    ) : (
-                        <span
-                            className="w-full cursor-pointer block min-w-10 min-h-4"
-                            onClick={() => {
-                                setEditing({ row: row.index, column: "id" })
-                                setEditValue(getValue())
-                            }}
-                        >
-                            {getValue()}
-                        </span>
-                    ),
+                  <EditableCell
+                    row={row}
+                    column="id"
+                    getValue={getValue}
+                    editing={editing}
+                    editValue={editValue}
+                    setEditing={setEditing}
+                    setEditValue={setEditValue}
+                    setData={setData}
+                    data={data}
+                    type="number"
+                    placeholder="Enter ID"
+                  />,
             },
             {
                 accessorKey: "type",
                 header: "Type",
-                cell: ({ row, getValue }: any) => (
+                cell: ({ row }: any) => (
                     <Select
                         value={row.original.type || ""}
                         onValueChange={value => {
@@ -104,9 +145,9 @@ export default function Page() {
                             <SelectValue placeholder="Select type" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="member">founding</SelectItem>
-                            <SelectItem value="admin">normal</SelectItem>
-                            <SelectItem value="guest">group</SelectItem>
+                            <SelectItem value="founding">founding</SelectItem>
+                            <SelectItem value="normal">normal</SelectItem>
+                            <SelectItem value="group">group</SelectItem>
                         </SelectContent>
                     </Select>
                 ),
@@ -115,147 +156,87 @@ export default function Page() {
                 accessorKey: "name",
                 header: "Name",
                 cell: ({ row, getValue }: any) =>
-                    editing?.row === row.index && editing?.column === "name" ? (
-                        <input
-                            value={editValue}
-                            onChange={e => setEditValue(e.target.value)}
-                            onBlur={() => {
-                                const newData = [...data]
-                                newData[row.index].name = editValue
-                                setData(newData)
-                                setEditing(null)
-                            }}
-                            autoFocus
-                            className="border px-2 py-1 rounded w-full"
-                        />
-                    ) : (
-                        <span
-                            className="w-full cursor-pointer block min-w-10 min-h-4"
-                            onClick={() => {
-                                setEditing({ row: row.index, column: "name" })
-                                setEditValue(getValue())
-                            }}
-                        >
-                            {getValue()}
-                        </span>
-                    ),
+                  <EditableCell
+                    row={row}
+                    column="name"
+                    getValue={getValue}
+                    editing={editing}
+                    editValue={editValue}
+                    setEditing={setEditing}
+                    setEditValue={setEditValue}
+                    setData={setData}
+                    data={data}
+                    placeholder="陳大明"
+                  />,
             },
             {
                 accessorKey: "govid",
                 header: "Gov ID",
                 cell: ({ row, getValue }: any) =>
-                    editing?.row === row.index && editing?.column === "govid" ? (
-                        <input
-                            value={editValue}
-                            onChange={e => setEditValue(e.target.value)}
-                            onBlur={() => {
-                                const newData = [...data]
-                                newData[row.index].govid = editValue
-                                setData(newData)
-                                setEditing(null)
-                            }}
-                            autoFocus
-                            className="border px-2 py-1 rounded w-full"
-                        />
-                    ) : (
-                        <span
-                            className="w-full cursor-pointer block min-w-10 min-h-4"
-                            onClick={() => {
-                                setEditing({ row: row.index, column: "govid" })
-                                setEditValue(getValue())
-                            }}
-                        >
-                            {getValue()}
-                        </span>
-                    ),
+                  <EditableCell
+                    row={row}
+                    column="govid"
+                    getValue={getValue}
+                    editing={editing}
+                    editValue={editValue}
+                    setEditing={setEditing}
+                    setEditValue={setEditValue}
+                    setData={setData}
+                    data={data}
+                    placeholder="A000000000"
+                  />,
             },
             {
                 accessorKey: "birthday",
                 header: "Birthday",
                 cell: ({ row, getValue }: any) =>
-                    editing?.row === row.index && editing?.column === "birthday" ? (
-                        <input
-                            type="date"
-                            value={editValue}
-                            onChange={e => setEditValue(e.target.value)}
-                            onBlur={() => {
-                                const newData = [...data]
-                                newData[row.index].birthday = editValue
-                                setData(newData)
-                                setEditing(null)
-                            }}
-                            autoFocus
-                            className="border px-2 py-1 rounded w-full"
-                        />
-                    ) : (
-                        <span
-                            onClick={() => {
-                                setEditing({ row: row.index, column: "birthday" })
-                                setEditValue(getValue())
-                            }}
-                            className="w-full cursor-pointer block min-w-10 min-h-4"
-                        >
-                            {getValue()}
-                        </span>
-                    ),
+                  <EditableCell
+                    row={row}
+                    column="birthday"
+                    getValue={getValue}
+                    editing={editing}
+                    editValue={editValue}
+                    setEditing={setEditing}
+                    setEditValue={setEditValue}
+                    setData={setData}
+                    data={data}
+                    type="date"
+                    placeholder="2000-01-01"
+                  />,
             },
             {
                 accessorKey: "email",
                 header: "Email",
                 cell: ({ row, getValue }: any) =>
-                    editing?.row === row.index && editing?.column === "email" ? (
-                        <input
-                            value={editValue}
-                            onChange={e => setEditValue(e.target.value)}
-                            onBlur={() => {
-                                const newData = [...data]
-                                newData[row.index].email = editValue
-                                setData(newData)
-                                setEditing(null)
-                            }}
-                            autoFocus
-                            className="border px-2 py-1 rounded w-full"
-                        />
-                    ) : (
-                        <span
-                            onClick={() => {
-                                setEditing({ row: row.index, column: "email" })
-                                setEditValue(getValue())
-                            }}
-                            className="w-full cursor-pointer block min-w-10 min-h-4"
-                        >
-                            {getValue()}
-                        </span>
-                    ),
+                  <EditableCell
+                    row={row}
+                    column="email"
+                    getValue={getValue}
+                    editing={editing}
+                    editValue={editValue}
+                    setEditing={setEditing}
+                    setEditValue={setEditValue}
+                    setData={setData}
+                    data={data}
+                    placeholder="hello@example.com"
+                  />,
             },
             {
                 accessorKey: "phone",
                 header: "Phone",
                 cell: ({ row, getValue }: any) =>
-                    editing?.row === row.index && editing?.column === "phone" ? (
-                        <input
-                            value={editValue}
-                            onChange={e => setEditValue(e.target.value)}
-                            onBlur={() => {
-                                const newData = [...data]
-                                newData[row.index].phone = editValue
-                                setData(newData)
-                                setEditing(null)
-                            }}
-                            autoFocus
-                            className="border px-2 py-1 rounded w-full"
-                        />
-                    ) : (
-                        <span
-                            onClick={() => {
-                                setEditing({ row: row.index, column: "phone" })
-                                setEditValue(getValue())
-                            }}
-                            className="w-full cursor-pointer block min-h-4 min-w-10"
-                        >
-                            {getValue()}
-                        </span>
-                    ),
+                  <EditableCell
+                    row={row}
+                    column="phone"
+                    getValue={getValue}
+                    editing={editing}
+                    editValue={editValue}
+                    setEditing={setEditing}
+                    setEditValue={setEditValue}
+                    setData={setData}
+                    data={data}
+                    placeholder="0912345678"
+                  />,
             },
         ],
         [data, editing, editValue]
@@ -278,7 +259,7 @@ export default function Page() {
                 id: getNextId(),
                 name: "",
                 govid: "",
-                type: "",
+                type: "normal",
                 birthday: "",
                 email: "",
                 phone: "",
@@ -287,7 +268,7 @@ export default function Page() {
     }
 
     return (
-        <div className="p-4">
+        <div className="p-4 flex flex-col items-end">
             <div className="relative flex flex-col gap-4 overflow-auto mt-4">
                 <div className="overflow-hidden rounded-lg border">
                     <Table className="table-fixed w-full">
@@ -336,7 +317,7 @@ export default function Page() {
                 </div>
             </div>
 
-            <div className="mb-4 flex items-center gap-4">
+            <div className="mb-4 flex items-center gap-4 mt-4">
                 <Button
                     onClick={() => saveMutation.mutate(data)}
                     disabled={saveMutation.isPending}
