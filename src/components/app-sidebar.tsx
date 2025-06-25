@@ -2,8 +2,8 @@
 
 import * as React from "react"
 
-import { NavMain } from "@/page/admin/components/nav-main"
-import { NavUser } from "@/page/admin/components/nav-user"
+import { NavMain } from "@/components/nav-main"
+import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
   SidebarContent,

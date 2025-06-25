@@ -99,7 +99,7 @@ const Page = () => {
                         <CircleCheck className="h-4 w-4 color-green-500" />
                         <AlertTitle>打卡成功！</AlertTitle>
                         <AlertDescription>
-                            這裹可能是一段歡迎文字？）(歡迎XXX學長/學姐)
+                            歡迎學長學姐蒞會員大會!
                         </AlertDescription>
                     </Alert>
                 </div>

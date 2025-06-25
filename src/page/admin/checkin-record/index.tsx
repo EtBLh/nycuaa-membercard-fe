@@ -10,12 +10,13 @@ import {
 } from "@/components/ui/select"
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
+import AddConferenceDialog from '@/components/add-conference-dialog';
 
 export default function Page() {
 
     const [selectedConf, setConf] = useState<number | null>(null);
 
-    const { data: conferences, isLoading: conLoading, isSuccess: conSuccess } = useQuery({
+    const { data: conferences, isLoading: conLoading, isSuccess: conSuccess, refetch: refetchConfList } = useQuery({
         queryKey: ['conference all'],
         queryFn: () => api.get<{ conferences: IConference[] }>(`/admin/conferences`),
         select: (res) => res.data.conferences
@@ -32,7 +33,7 @@ export default function Page() {
         <div className="flex flex-1 flex-col">
             <div className="@container/main flex flex-1 flex-col gap-2">
                 <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4">
-                    <header>
+                    <header className='flex items-center gap-2'>
                         {
                             conLoading && 'loading...'
                         }
@@ -57,6 +58,7 @@ export default function Page() {
                                 </Select>
                             )
                         }
+                        <AddConferenceDialog refetch={refetchConfList}/>
                     </header>
                     <main className='flex flex-wrap gap-2'>
                         {

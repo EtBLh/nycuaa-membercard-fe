@@ -6,7 +6,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { ScanQrCode, ScrollText, UserCog, UserPlus, UsersIcon } from "lucide-react"
+import { ScanQrCode, ScrollText, UserPlus, UsersIcon } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 
 const memberBtns = [
@@ -19,11 +19,6 @@ const memberBtns = [
     title: 'Bulk Add',
     icon: UserPlus,
     to: '/admin/bulk-add'
-  },
-  {
-    title: 'Bulk Edit',
-    icon: UserCog,
-    to: '/admin/bulk-edit'
   },
 ]
 
