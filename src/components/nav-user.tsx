@@ -26,12 +26,6 @@ import { logout, RootState } from "@/store"
 import { useQuery } from "@tanstack/react-query"
 import { api } from "@/lib/utils"
 
-const user = {
-  name: "lkc404",
-  email: "lkc404@nycuaa.org",
-  avatar: "/avatars/shadcn.jpg",
-}
-
 export function NavUser(){
   const { isMobile } = useSidebar();
   const dispatch = useDispatch();

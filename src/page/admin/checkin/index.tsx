@@ -2,7 +2,7 @@ import { IConference } from '@/lib/types';
 import { api } from '@/lib/utils';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { IDetectedBarcode, Scanner } from '@yudiel/react-qr-scanner';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Select,
     SelectContent,
@@ -18,10 +18,11 @@ import CheckInStep2 from '@/assets/checkin-step2.png'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { QRCodeSVG } from 'qrcode.react';
 import { AxiosError } from 'axios';
+import { toast } from 'sonner';
 
 const Page = () => {
 
-    const [selectedConf, setConf] = useState<number | null>(1);
+    const [selectedConf, setConf] = useState<number | null>(null);
 
     const onScan = (result: IDetectedBarcode[]) => {
         if (selectedConf === null) {
@@ -36,21 +37,33 @@ const Page = () => {
         queryFn: () => api.get<{ conferences: IConference[] }>(`/admin/conferences?today=1`),
         select: (res) => res.data.conferences
     })
+    useEffect(() => {
+        if (!selectedConf && conferences && conferences.length > 0) {
+            setConf(conferences[0].id);
+        }
+    }, [conferences])
 
     const { mutate: submitCheckinRecord } = useMutation({
         mutationFn: (qrcode: string) => api.post(`/admin/conference/${selectedConf}/check-in`, {qrcode}),
         onSuccess: (res) => {
             if (res.status === 200 ) {
-                alert('success');
+                toast.success('打卡成功!', {
+                    description: '歡迎學長學姐蒞會員大會!'
+                })
             } else if (res.status === 202) {
-                alert('already checked in')
+                toast.success('已打卡')
             }
         },
         onError: (err: AxiosError) => {
-            //@ts-ignore
-            alert(`check in failed D: ${err.response?.data.message}`)
+            toast.error('打卡失敗', {
+                //@ts-ignore
+                description: err.response?.data?.message || '請稍後再試'
+            });
+            
         }
     })
+
+    console.log('selectedConf', selectedConf);
 
     if (isLoading) {
         return <>loading...</>
@@ -59,23 +72,6 @@ const Page = () => {
     return <main className='flex items-center justify-center h-full py-4 pl-4'>
 
         <Card className='flex-4 h-full relative'>
-            <Select>
-                <SelectTrigger className="w-[180px] absolute top-6 right-6" value={selectedConf?.toString()}>
-                    <SelectValue placeholder="Conference" />
-                </SelectTrigger>
-                <SelectContent>
-                    {
-                        conferences?.map(con => (
-                            <SelectItem
-                                value={con.id.toString()}
-                                onClick={() => setConf(con.id)}
-                            >
-                                {con.name}
-                            </SelectItem>
-                        ))
-                    }
-                </SelectContent>
-            </Select>
             <CardHeader>
                 <CardDescription>
                     國立陽明交通大學校友總會
@@ -122,9 +118,26 @@ const Page = () => {
             </CardFooter>
         </Card>
         <section className='flex items-center justify-center flex-5 relative'>
-            <div className='w-[520px] p-[36px] aspect-square'>
+            <div className='w-[520px] p-[36px] aspect-square items-end'>
+            <Select onValueChange={(val) => setConf(parseInt(val))} value={selectedConf?.toString()}>
+                <SelectTrigger className="w-[180px] mb-2">
+                    <SelectValue placeholder="Select a conference" />
+                </SelectTrigger>
+                <SelectContent>
+                    {
+                        conferences?.map(con => (
+                            <SelectItem value={con.id.toString()}>
+                                {con.name}
+                            </SelectItem>
+                        ))
+                    }
+                </SelectContent>
+            </Select>
                 <Scanner
                     onScan={onScan}
+                    scanDelay={ 500 }
+                    onError={(err) => {console.error(err)}}
+                    allowMultiple
                     styles={{
                         container: {
                             border: 'none',
@@ -138,13 +151,6 @@ const Page = () => {
                     }}
                 />
             </div>
-            <Alert className='absolute -bottom-[40px] left-1/2 w-[500px] transform-[translateX(-50%)]'>
-                <CircleCheck className="h-4 w-4 color-green-500" />
-                <AlertTitle>打卡成功！</AlertTitle>
-                <AlertDescription>
-                    這裹可能是一段歡迎文字？）
-                </AlertDescription>
-            </Alert>
         </section>
     </main>
 }

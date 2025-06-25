@@ -32,18 +32,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { IMemberData } from "@/lib/types"
 import { api } from "@/lib/utils"
 import { selectToken } from "@/redux/authSlice"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { AxiosError } from "axios"
-import { IdCard } from "lucide-react"
+import { useEffect } from "react"
 import { useSelector } from "react-redux"
 import AddMemberDialog from "./addMemberDialog"
-import useMemberDataTableColDef from "./useMemberDataTableColDef"
-import { useEffect } from "react"
 import SendEmailDialog from "./sendEmailDialog"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import useMemberDataTableColDef from "./useMemberDataTableColDef"
+import { TicketCheck } from "lucide-react"
+import { toast } from "sonner"
 
 export const MemberFullSchema = z.object({
   id: z.number(),
@@ -90,7 +90,7 @@ export function DataTable() {
       }),
     select: res => res.data
   })
-  
+
   const columns = useMemberDataTableColDef(refetch);
 
   const [rowSelection, setRowSelection] = React.useState({})
@@ -122,6 +122,17 @@ export function DataTable() {
     manualSorting: true,
   })
 
+    const bulkSetMemberPaidMutation = useMutation({
+        mutationFn: ({id}: {id: string[]}) => api.post(`/admin/member/${id.join(',')}/set-paid`, { paid: true }),
+        onSuccess: () => {
+            toast.success(`Members set paid successfully`);
+            refetch();
+        },
+        onError: () => {
+            toast.error(`Members set paid faild`);
+        }
+    })
+
   return (
     <div className="w-full flex-col justify-start gap-6">
       <div className="flex items-center justify-between px-4 lg:px-6 flex-wrap lg:flex-nowrap">
@@ -136,8 +147,16 @@ export function DataTable() {
           />
         </div>
         <div className="flex items-center gap-2 w-full md:w-auto">
-          <AddMemberDialog refetch={refetch}/>
-          <SendEmailDialog refetch={refetch} rowSelection={rowSelection}/>
+          <AddMemberDialog refetch={refetch} />
+          <Tooltip>
+            <TooltipContent>Set Member as Paid</TooltipContent>
+            <TooltipTrigger asChild>
+              <Button size="sm" disabled={!rowSelection || !Object.keys(rowSelection).length} onClick={() => bulkSetMemberPaidMutation.mutate({ id: Object.keys(rowSelection) })}>
+                <TicketCheck />
+              </Button>
+            </TooltipTrigger>
+          </Tooltip>
+          <SendEmailDialog refetch={refetch} rowSelection={rowSelection} />
         </div>
       </div>
       <div className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6 mt-4">

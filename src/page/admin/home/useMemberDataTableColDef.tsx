@@ -117,8 +117,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
             refetch();
         },
         onError: (_, { name, paid }) => {
-            toast.success(`Member ${name} set ${paid?'paid':'unpaid'} faild`);
-            toast.error('failed D:')
+            toast.error(`Member ${name} set ${paid?'paid':'unpaid'} faild`);
         }
     })
 

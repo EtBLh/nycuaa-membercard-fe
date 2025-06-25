@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,
@@ -7,26 +8,22 @@ import {
     DialogTitle,
     DialogTrigger
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { api } from "@/lib/utils";
+import { IconCircleCheckFilled } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { IdCard } from "lucide-react";
+import { Ban, CheckCircle2, IdCard, Loader2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Ban } from "lucide-react";
-import { IconCircleCheckFilled } from "@tabler/icons-react";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 
 type TEmailPreview = {
     id: string;
@@ -41,7 +38,7 @@ const SendEmailDialog = (props: {
 }) => {
     const [open, setOpen] = useState(false);
 
-    const { rowSelection, refetch } = props;
+    const { rowSelection } = props;
 
     // Track status for each member id: idle | loading | success | failed
     const [sendStatus, setSendStatus] = useState<Record<string, "idle" | "loading" | "success" | "failed">>({});
