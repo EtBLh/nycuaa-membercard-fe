@@ -19,6 +19,7 @@ import { api } from "@/lib/utils"
 import { useMutation } from "@tanstack/react-query"
 import { AxiosError } from "axios"
 import { toast } from "sonner"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export const MemberMinimalSchema = z.object({
     id: z.number(),
@@ -88,6 +89,29 @@ export default function Page() {
                     ),
             },
             {
+                accessorKey: "type",
+                header: "Type",
+                cell: ({ row, getValue }: any) => (
+                    <Select
+                        value={row.original.type || ""}
+                        onValueChange={value => {
+                            const newData = [...data]
+                            newData[row.index].type = value
+                            setData(newData)
+                        }}
+                    >
+                        <SelectTrigger className="w-full border px-2 py-1 rounded">
+                            <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="member">founding</SelectItem>
+                            <SelectItem value="admin">normal</SelectItem>
+                            <SelectItem value="guest">group</SelectItem>
+                        </SelectContent>
+                    </Select>
+                ),
+            },
+            {
                 accessorKey: "name",
                 header: "Name",
                 cell: ({ row, getValue }: any) =>
@@ -140,35 +164,6 @@ export default function Page() {
                                 setEditing({ row: row.index, column: "govid" })
                                 setEditValue(getValue())
                             }}
-                        >
-                            {getValue()}
-                        </span>
-                    ),
-            },
-            {
-                accessorKey: "type",
-                header: "Type",
-                cell: ({ row, getValue }: any) =>
-                    editing?.row === row.index && editing?.column === "type" ? (
-                        <input
-                            value={editValue}
-                            onChange={e => setEditValue(e.target.value)}
-                            onBlur={() => {
-                                const newData = [...data]
-                                newData[row.index].type = editValue
-                                setData(newData)
-                                setEditing(null)
-                            }}
-                            autoFocus
-                            className="border px-2 py-1 rounded w-full"
-                        />
-                    ) : (
-                        <span
-                            onClick={() => {
-                                setEditing({ row: row.index, column: "type" })
-                                setEditValue(getValue())
-                            }}
-                            className="w-full cursor-pointer block min-w-10 min-h-4"
                         >
                             {getValue()}
                         </span>
@@ -295,12 +290,15 @@ export default function Page() {
         <div className="p-4">
             <div className="relative flex flex-col gap-4 overflow-auto mt-4">
                 <div className="overflow-hidden rounded-lg border">
-                    <Table>
+                    <Table className="table-fixed w-full">
                         <TableHeader className="bg-muted sticky top-0 z-10">
                             {table.getHeaderGroups().map(headerGroup => (
                                 <TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map(header => (
-                                        <TableHead key={header.id}>
+                                        <TableHead
+                                            key={header.id}
+                                            className="w-1/7 text-center"
+                                        >
                                             {flexRender(header.column.columnDef.header, header.getContext())}
                                         </TableHead>
                                     ))}
@@ -311,7 +309,10 @@ export default function Page() {
                             {table.getRowModel().rows.map(row => (
                                 <TableRow key={row.id}>
                                     {row.getVisibleCells().map(cell => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell
+                                            key={cell.id}
+                                            className="w-1/7 align-middle"
+                                        >
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
                                     ))}

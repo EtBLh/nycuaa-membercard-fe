@@ -38,10 +38,11 @@ import { api } from "@/lib/utils"
 import { selectToken } from "@/redux/authSlice"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { AxiosError } from "axios"
-import { IdCard, Mail } from "lucide-react"
+import { IdCard } from "lucide-react"
 import { useSelector } from "react-redux"
-import AddMemberDialog from "../../../components/add-member-dialog"
+import AddMemberDialog from "./addMemberDialog"
 import useMemberDataTableColDef from "./useMemberDataTableColDef"
+import { useEffect } from "react"
 
 export const MemberFullSchema = z.object({
   id: z.number(),
@@ -66,8 +67,14 @@ export function DataTable() {
   const searchValue = columnFilters.find(f => f.id === 'search')?.value || ''
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 50,
   })
+  useEffect(() => {
+    setPagination(prev => ({
+      pageIndex: 0,
+      pageSize: prev.pageSize,
+    }))
+  }, [searchValue])
 
 
   const { data, isLoading: loading, refetch } = useQuery({
@@ -115,24 +122,8 @@ export function DataTable() {
     manualSorting: true,
   })
 
-
-
-  const invitationLetter = useMutation({
-    mutationFn: (memberIds: string[]) => api.post(`/admin/send-invitation-letter`, { member_ids: memberIds }),
-    onSuccess: (res) => {
-      alert('success: ' + JSON.stringify(res.data))
-    },
-    onError: (err: AxiosError<{error: string}>) => {
-      alert('error:'+ err.response?.data.error)
-    }
-  })
-
-  const sendInvitationLetter = () => {
-    invitationLetter.mutate(Object.keys(rowSelection));
-  }
-
-  const updateMemberCard = useMutation({
-    mutationFn: (memberIds: string[]) => api.post(`/admin/update-member-card`, { member_ids: memberIds }),
+  const sendMemberCardMutation = useMutation({
+    mutationFn: (memberIds: string[]) => api.post(`/admin/send-member-card`, { member_ids: memberIds }),
     onSuccess: (res) => {
       alert('succcess ' + JSON.stringify(res.data));
     },
@@ -141,8 +132,8 @@ export function DataTable() {
     }
   })
 
-  const sendUpdatedMemberCard = () => {
-    updateMemberCard.mutate(Object.keys(rowSelection));
+  const sendMemberCard = () => {
+    sendMemberCardMutation.mutate(Object.keys(rowSelection));
   }
 
   return (
@@ -163,16 +154,8 @@ export function DataTable() {
           <Tooltip>
             <TooltipContent>Send Updated MemberCard(by email)</TooltipContent>
             <TooltipTrigger>
-              <Button size="sm" onClick={sendUpdatedMemberCard}>
+              <Button size="sm" onClick={sendMemberCard} disabled={!Object.keys(rowSelection).length}>
                 <IdCard />
-              </Button>
-            </TooltipTrigger>
-          </Tooltip>
-          <Tooltip>
-            <TooltipContent>Send Invitation Letter</TooltipContent>
-            <TooltipTrigger>
-              <Button size="sm" onClick={sendInvitationLetter}>
-                <Mail />
               </Button>
             </TooltipTrigger>
           </Tooltip>
@@ -256,7 +239,7 @@ export function DataTable() {
                   />
                 </SelectTrigger>
                 <SelectContent side="top">
-                  {[10, 20, 30, 40, 50].map((pageSize) => (
+                  {[20, 50, 100].map((pageSize) => (
                     <SelectItem key={pageSize} value={`${pageSize}`}>
                       {pageSize}
                     </SelectItem>

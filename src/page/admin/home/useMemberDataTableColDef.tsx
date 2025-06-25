@@ -30,6 +30,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { api } from "@/lib/utils"
 import { useEffect, useRef, useState, useMemo } from "react"
 import { Spinner } from "@/components/ui/spinner"
+import { toast } from "sonner"
 
 
 type EditableCellProps = {
@@ -41,7 +42,7 @@ type EditableCellProps = {
 const EditableCell: React.FC<EditableCellProps> = ({ field, memberId, value: initialValue }) => {
 
     const prevValue = useRef(initialValue);
-    const queryClient = useQueryClient()
+    // const queryClient = useQueryClient()
 
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(prevValue.current);   
@@ -53,7 +54,7 @@ const EditableCell: React.FC<EditableCellProps> = ({ field, memberId, value: ini
         onSuccess: () => {
             setIsEditing(false); // Exit editing mode on success
             prevValue.current = value; // Update the previous value to the new one
-            queryClient.invalidateQueries([''])
+            // queryClient.invalidateQueries([''])
         },
         onError: () => {
             console.error("Failed to save value");
@@ -76,7 +77,7 @@ const EditableCell: React.FC<EditableCellProps> = ({ field, memberId, value: ini
             <div className="flex items-center jusify-between">
                 {saveMutation.isPending && <Spinner className="inline-block w-4 h-4 mr-2" />}
                 <input
-                    className="border rounded px-2 py-1 w-full"
+                    className="border rounded px-2 py-1"
                     value={value}
                     autoFocus
                     onChange={e => setValue(e.target.value)}
@@ -110,14 +111,15 @@ const EditableCell: React.FC<EditableCellProps> = ({ field, memberId, value: ini
 
 const useMemberDataTableColDef = (refetch: () => void) => {
 
-    const setMemberPaid = useMutation({
-        mutationFn: (id: number) => api.post(`/admin/member/${id}/set-paid`, { paid: true }),
-        onSuccess: () => {
-            alert('success');
+    const setMemberPaidMutation = useMutation({
+        mutationFn: ({id, paid}: {id: number, name: string, paid: boolean}) => api.post(`/admin/member/${id}/set-paid`, { paid }),
+        onSuccess: (_, { name, paid }) => {
+            toast.success(`Member ${name} set ${paid?'paid':'unpaid'} successfully`);
             refetch();
         },
-        onError: () => {
-            alert('failed D:')
+        onError: (_, { name, paid }) => {
+            toast.success(`Member ${name} set ${paid?'paid':'unpaid'} faild`);
+            toast.error('failed D:')
         }
     })
 
@@ -152,6 +154,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
             accessorKey: "id",
             header: "Member ID",
             enableHiding: false,
+            width: 60,
         },
         {
             accessorKey: "type",
@@ -170,6 +173,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         {
             accessorKey: "name",
             header: "Name",
+            width: 80,
             enableHiding: false,
             cell: ({ getValue, row }) => (
                 <EditableCell memberId={row.original.id} field="name" value={getValue() as string} />
@@ -178,6 +182,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         {
             accessorKey: "govid",
             header: "Government ID",
+            width: 120,
             cell: ({ getValue, row }) => (
                 <EditableCell memberId={row.original.id} field="govid" value={getValue() as string} />
             ),
@@ -185,6 +190,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         {
             accessorKey: "email",
             header: "Email",
+            width: 300,
             cell: ({ getValue, row }) => (
                 <EditableCell memberId={row.original.id} field="email" value={getValue() as string} />
             ),
@@ -192,6 +198,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         {
             accessorKey: "phone",
             header: "Phone",
+            width: 150,
             cell: ({ getValue, row }) => (
                 <EditableCell memberId={row.original.id} field="phone" value={getValue() as string} />
             ),
@@ -199,8 +206,11 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         {
             accessorKey: "qrcode",
             header: "QRCode",
-            cell: (param) => (
-                <HoverCard>
+            cell: (param) => {
+                if (!param.row.original.qrcode) {
+                    return <Badge variant='outline' className="bg-red-900">no qrcode</Badge>
+                }
+                return <HoverCard>
                     <HoverCardTrigger>
                         <Badge variant='outline'>hover to show</Badge>
                     </HoverCardTrigger>
@@ -214,11 +224,12 @@ const useMemberDataTableColDef = (refetch: () => void) => {
                         <span className="text-xs opacity-[0.8]">{param.row.original.id}</span>
                     </HoverCardContent>
                 </HoverCard>
-            )
+            }
         },
         {
             accessorKey: "permit",
-            header: "Status",
+            header: "is member paid?",
+            width: 80,
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-muted-foreground px-1.5">
                     {row.original.permit ? (
@@ -232,9 +243,10 @@ const useMemberDataTableColDef = (refetch: () => void) => {
                 </Badge>
             ),
         },
-        {
+        {   
             accessorKey: "icon_uploaded",
-            header: "icon?",
+            header: "is icon uploaded?",
+            width: 80,
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-muted-foreground px-1.5">
                     {row.original.icon_uploaded ? (
@@ -250,7 +262,8 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         },
         {
             accessorKey: "card_created",
-            header: "pass?",
+            header: "is card sent?",
+            width: 80,
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-muted-foreground px-1.5">
                     {row.original.card_created ? (
@@ -279,8 +292,16 @@ const useMemberDataTableColDef = (refetch: () => void) => {
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-32">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => setMemberPaid.mutate(row.original.id)}>Set as paid</DropdownMenuItem>
+                        <DropdownMenuItem 
+                            onClick={() => {
+                                setMemberPaidMutation.mutate({
+                                    id: row.original.id, 
+                                    name: row.original.name,
+                                    paid: !row.original.permit
+                                })
+                            }}>
+                                Set as {row.original.permit ? 'unpaid' : 'paid'}
+                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
                     </DropdownMenuContent>
