@@ -11,12 +11,12 @@ import { Link, useLocation } from "react-router-dom"
 
 const memberBtns = [
   {
-    title: 'All Member',
+    title: '會員列表',
     icon: UsersIcon,
     to: '/admin/home'
   },
   {
-    title: 'Bulk Add',
+    title: '批量新增',
     icon: UserPlus,
     to: '/admin/bulk-add'
   },
@@ -24,12 +24,12 @@ const memberBtns = [
 
 const checkInBtns = [
   {
-    title: 'Check-in',
+    title: '會議打卡',
     icon: ScanQrCode,
     to: '/admin/conference/checkin'
   },
   {
-    title: 'Check-in record',
+    title: '打卡記錄',
     icon: ScrollText,
     to: '/admin/checkin-record'
   },
@@ -67,11 +67,11 @@ export function NavMain() {
     <SidebarGroup>
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
-          <SidebarGroupLabel>Member Data</SidebarGroupLabel>
+          <SidebarGroupLabel>會員資料管理</SidebarGroupLabel>
           {
             memberBtns.map(NavFactory)
           }
-          <SidebarGroupLabel>Member Conference</SidebarGroupLabel>
+          <SidebarGroupLabel>會議打卡</SidebarGroupLabel>
           {
             checkInBtns.map(NavFactory)
           }

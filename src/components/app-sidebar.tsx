@@ -28,7 +28,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <Link to="/admin/home">
                 <img src={logo} height={28} width={28}/>
-                <span className="text-base font-semibold">NYCUAA</span>
+                <span className="text-base font-semibold">國立陽明交通大學校友總會</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
