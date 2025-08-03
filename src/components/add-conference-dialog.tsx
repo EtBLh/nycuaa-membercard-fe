@@ -72,12 +72,12 @@ const AddConferenceDialog = (props: {
             <DialogTrigger asChild>
                 <Button size="sm">
                     <IconPlus />
-                    <span className="hidden lg:inline">Add New Conference</span>
+                    <span className="hidden lg:inline">新增會議</span>
                 </Button>
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Add New Conference</DialogTitle>
+                    <DialogTitle>新增會議</DialogTitle>
                 </DialogHeader>
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(data => addMember.mutate(data))} className="space-y-4">
@@ -86,7 +86,7 @@ const AddConferenceDialog = (props: {
                             name="name"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Conference Name</FormLabel>
+                                    <FormLabel>會議名稱</FormLabel>
                                     <FormControl>
                                         <Input placeholder="" {...field} />
                                     </FormControl>
@@ -113,7 +113,7 @@ const AddConferenceDialog = (props: {
                                                     {field.value ? (
                                                         format(field.value, "PPP")
                                                     ) : (
-                                                        <span>Pick a date</span>
+                                                        <span>選擇日期</span>
                                                     )}
                                                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                                 </Button>
@@ -125,7 +125,7 @@ const AddConferenceDialog = (props: {
                                                 selected={field.value}
                                                 onSelect={field.onChange}
                                                 disabled={(date) =>
-                                                    date > new Date() || date < new Date("1900-01-01")
+                                                    date < new Date("1900-01-01")
                                                 }
                                                 initialFocus
                                             />
@@ -136,7 +136,7 @@ const AddConferenceDialog = (props: {
                             )}
                         />
                         <div className="flex flex-row justify-end">
-                            <Button type="submit" disabled={addMember.isPending}>Submit</Button>
+                            <Button type="submit" disabled={addMember.isPending}>確認新增</Button>
                         </div>
                     </form>
                 </Form>

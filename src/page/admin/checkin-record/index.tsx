@@ -72,11 +72,11 @@ export default function Page() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>Member ID</TableHead>
-                                    <TableHead>Name</TableHead>
+                                    <TableHead>會員ID</TableHead>
+                                    <TableHead>名稱</TableHead>
                                     <TableHead>Email</TableHead>
-                                    <TableHead>Phone</TableHead>
-                                    <TableHead>Check-in Time</TableHead>
+                                    <TableHead>電話</TableHead>
+                                    <TableHead>打卡時間</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -90,7 +90,7 @@ export default function Page() {
                                 {selectedConf === null && (
                                         <TableRow>
                                             <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                                Select a conference to view check-in records.
+                                                請選擇會議
                                             </TableCell>
                                         </TableRow>
                                 )}
@@ -98,7 +98,7 @@ export default function Page() {
                                     members.length === 0 ? (
                                         <TableRow>
                                             <TableCell colSpan={5} className="text-center text-muted-foreground">
-                                                No check-in records.
+                                                無打卡記錄
                                             </TableCell>
                                         </TableRow>
                                     ) : (

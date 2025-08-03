@@ -24,11 +24,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
+              className="data-[slot=sidebar-menu-button]:!p-1.5 h-12"
             >
               <Link to="/admin/home">
-                <img src={logo} height={28} width={28}/>
-                <span className="text-base font-semibold">國立陽明交通大學校友總會</span>
+                <img src={logo} height={32} width={32}/>
+                <div className="flex flex-col items-start justify-center">
+                  <span className="text-sm">國立陽明交通大學校友總會</span>
+                  <span className="text-sm font-semibold">會員證系統</span>
+                </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -73,24 +73,30 @@ export default function LoginPage() {
   return <CardLayout>
     <Card>
       <CardHeader className="text-center">
-        <CardTitle className="text-xl flex flex-col items-center justify-center gap-2">
-          <IdCard className='w-[48px] h-[48px]' />Member Card System Admin Panel
+        <CardTitle className="flex flex-col items-center justify-center gap-0">
+          <IdCard className='w-[48px] h-[48px] mb-1'/>
+          <span className='text-xl font-semibold'>
+            國立陽明交通大學校友總會
+          </span>
+          <span className='text-lg font-semibold mt-0'>
+            會員證系統
+          </span>
         </CardTitle>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit((data) => onLogin(data))}>
           <div className="grid gap-6">
             <div className="grid gap-2">
-              <Label htmlFor="account">Account</Label>
+              <Label htmlFor="account">帳號</Label>
               <Input id="account" {...register('account')} />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">密碼</Label>
               <Input id="password" type='password' {...register('password')} />
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {
-                loading ? <Spinner className='text-[black]' size={"small"} /> : 'Login'
+                loading ? <Spinner className='text-[black]' size={"small"} /> : '登入'
               }
             </Button>
             {error && errorMessage && <p className="text-sm text-destructive text-center">{errorMessage}</p>}

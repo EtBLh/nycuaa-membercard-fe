@@ -7,7 +7,6 @@ import {
 } from "@tanstack/react-table"
 import { z } from "zod"
 
-import logo from '@/assets/logo.png'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -18,19 +17,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
-import {
-    HoverCard,
-    HoverCardContent,
-    HoverCardTrigger,
-} from "@/components/ui/hover-card"
-import { Ban, Rabbit, User, Users } from "lucide-react"
-import { QRCodeSVG } from 'qrcode.react'
-import { MemberFullSchema } from "./memberDataTable"
-import { useMutation } from "@tanstack/react-query"
-import { api } from "@/lib/utils"
-import { useEffect, useRef, useState, useMemo } from "react"
 import { Spinner } from "@/components/ui/spinner"
+import { api } from "@/lib/utils"
+import { useMutation } from "@tanstack/react-query"
+import { Ban } from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
+import { MemberTypeBadge, PaidStatusBadge, QRCodeBadge } from "./Badges"
+import { MemberFullSchema } from "./memberDataTable"
 
 
 type EditableCellProps = {
@@ -161,27 +155,18 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         },
         {
             accessorKey: "id",
-            header: "Member ID",
+            header: "會員ID",
             enableHiding: false,
             width: 60,
         },
         {
             accessorKey: "type",
-            header: "Type",
-            cell: ({ row }) => (
-                <Badge variant={row.original.type === 'founding' ? 'secondary' : 'outline'}>
-                    {row.original.type === 'normal' && <User />}
-                    {row.original.type === 'group' && <Users />}
-                    {row.original.type === 'founding' && <Rabbit />}
-                    {
-                        row.original.type
-                    }
-                </Badge>
-            )
+            header: "類型",
+            cell: ({ row }) => <MemberTypeBadge type={row.original.type}/>
         },
         {
             accessorKey: "name",
-            header: "Name",
+            header: "名稱",
             width: 80,
             enableHiding: false,
             cell: ({ getValue, row }) => (
@@ -190,7 +175,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         },
         {
             accessorKey: "govid",
-            header: "Government ID",
+            header: "身份證字號",
             width: 120,
             cell: ({ getValue, row }) => (
                 <EditableCell memberId={row.original.id} field="govid" value={getValue() as string} />
@@ -206,7 +191,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         },
         {
             accessorKey: "phone",
-            header: "Phone",
+            header: "電話",
             width: 150,
             cell: ({ getValue, row }) => (
                 <EditableCell memberId={row.original.id} field="phone" value={getValue() as string} />
@@ -215,46 +200,17 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         {
             accessorKey: "qrcode",
             header: "QRCode",
-            cell: (param) => {
-                if (!param.row.original.qrcode) {
-                    return <Badge variant='outline' className="bg-red-900">no qrcode</Badge>
-                }
-                return <HoverCard>
-                    <HoverCardTrigger>
-                        <Badge variant='outline'>hover to show</Badge>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="flex flex-col w-[200px] items-center">
-                        <span className="text-sm opacity-[0.8] mb-4 flex justify-center items-center">
-                            <img src={logo} alt="NYCU logo" width={24} height={24} />
-                            <span className="ml-1 mr-2">NYCUAA</span>
-                            <span>{param.row.original.name}</span>
-                        </span>
-                        <QRCodeSVG value={param.row.original.qrcode} bgColor="#0f172b" fgColor="#f8fafc" />
-                        <span className="text-xs opacity-[0.8]">{param.row.original.id}</span>
-                    </HoverCardContent>
-                </HoverCard>
-            }
+            cell: (param) => <QRCodeBadge {...param.row.original}/>
         },
         {
             accessorKey: "permit",
-            header: "is member paid?",
+            header: "付費狀態",
             width: 80,
-            cell: ({ row }) => (
-                <Badge variant="outline" className="text-muted-foreground px-1.5">
-                    {row.original.permit ? (
-                        <IconCircleCheckFilled className="fill-green-500 dark:fill-green-400" />
-                    ) : (
-                        <Ban />
-                    )}
-                    {
-                        row.original.permit ? 'paid' : 'unpaid'
-                    }
-                </Badge>
-            ),
+            cell: ({ row }) => <PaidStatusBadge permit={row.original.permit}/>,
         },
         {   
             accessorKey: "icon_uploaded",
-            header: "is icon uploaded?",
+            header: "大頭貼上傳狀態",
             width: 80,
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-muted-foreground px-1.5">
@@ -271,7 +227,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
         },
         {
             accessorKey: "card_created",
-            header: "is card sent?",
+            header: "會員證是否已寄出",
             width: 80,
             cell: ({ row }) => (
                 <Badge variant="outline" className="text-muted-foreground px-1.5">

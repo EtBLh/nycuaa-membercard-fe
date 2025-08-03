@@ -24,6 +24,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { Ban, CheckCircle2, IdCard, Loader2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
+import { number } from "zod";
 
 type TEmailPreview = {
     id: string;
@@ -63,7 +64,7 @@ const SendEmailDialog = (props: {
                 successes: { id: string }[];
                 errors: { id: string }[];
                 skipped: { id: string }[];
-            }>(`/admin/send-member-card`, { member_ids: memberIds });
+            }>(`/admin/send-member-card`, { member_ids: memberIds.map(id => Number(id)) });
         },
         onSuccess: (res) => {
             // Mark successes and failures
@@ -93,36 +94,33 @@ const SendEmailDialog = (props: {
         sendMemberCardMutation.mutate(Object.keys(rowSelection));
     }
 
+    console.log("Row selection:", rowSelection);
+
     const previewQuery = useQuery({
         queryKey: ['sendMemberCardPreview', Object.keys(rowSelection)],
-        queryFn: () => api.post<TEmailPreview[]>('/admin/send-member-card/preview', { member_ids: Object.keys(rowSelection) }),
+        queryFn: () => api.post<TEmailPreview[]>('/admin/send-member-card/preview', { member_ids: Object.keys(rowSelection).map(id => Number(id)) }),
         enabled: open && Object.keys(rowSelection).length > 0
     });
 
     return (
         <Dialog open={open} onOpenChange={val => setOpen(val)}>
-            <Tooltip>
-                <TooltipContent>Send MemberCard / Invitation Email</TooltipContent>
-                <TooltipTrigger asChild>
-                    <DialogTrigger asChild>
-                        <Button size="sm" disabled={!rowSelection || !Object.keys(rowSelection).length}>
-                            <IdCard />
-                        </Button>
-                    </DialogTrigger>
-                </TooltipTrigger>
-            </Tooltip>
+            <DialogTrigger asChild>
+                <Button size="sm" disabled={!rowSelection || !Object.keys(rowSelection).length} variant="outline">
+                    <IdCard /> 發送會員證郵件
+                </Button>
+            </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Send Member Card Email</DialogTitle>
+                    <DialogTitle>發送會員證郵件</DialogTitle>
                 </DialogHeader>
                 <ScrollArea className="max-h-[400px] w-full rounded-md border my-4">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
-                        <TableHead>is Member Paid?</TableHead>
-                        <TableHead>Email Type</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead>名稱</TableHead>
+                        <TableHead>是否已付款</TableHead>
+                        <TableHead>郵件類型</TableHead>
+                        <TableHead>傳送狀態</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -157,15 +155,15 @@ const SendEmailDialog = (props: {
                             <TableCell>
                               {item.email_type === 'update_card' ? (
                                 <Badge variant="secondary" className="text-green-600 px-1.5">
-                                  send updated card
+                                  將發送更新後的會員卡
                                 </Badge>
                               ) : item.email_type === 'invitation' ? (
                                 <Badge variant="secondary" className="text-blue-500 px-1.5">
-                                  invitation for issuing card
+                                  將發送邀請郵件
                                 </Badge>
                               ) : (
                                 <Badge variant="secondary" className="text-red-700 px-1.5">
-                                  invalid
+                                  無法發送郵件 ({item.permit ? "" : "未付款"})
                                 </Badge>
                               )}
                             </TableCell>
@@ -209,7 +207,7 @@ const SendEmailDialog = (props: {
                         !previewQuery.data.data.every(item => item.permit)
                       }
                     >
-                      {sendMemberCardMutation.isPending ? "Sending..." : "Confirm Send Email"}
+                      {sendMemberCardMutation.isPending ? "傳送中..." : "確認發送郵件"}
                     </Button>
                 </DialogFooter>
             </DialogContent>
