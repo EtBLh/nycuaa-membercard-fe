@@ -16,7 +16,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { IMemberData } from "@/lib/types";
 import { api } from "@/lib/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -25,11 +24,6 @@ import { TicketCheck } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { PaidStatusBadge } from "./Badges";
-
-type TMemberPreview = {
-    id: string;
-    name: string;
-}
 
 const SetAsPaidDialog = (props: {
     refetch?: () => void

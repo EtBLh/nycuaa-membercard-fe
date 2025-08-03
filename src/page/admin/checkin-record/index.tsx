@@ -1,23 +1,23 @@
-import { IConference, IMemberData } from '@/lib/types';
-import { api } from '@/lib/utils';
-import { useQuery } from '@tanstack/react-query';
+import AddConferenceDialog from '@/components/add-conference-dialog';
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select"
-import { useState } from 'react';
-import AddConferenceDialog from '@/components/add-conference-dialog';
+} from "@/components/ui/select";
 import {
     Table,
-    TableHeader,
     TableBody,
-    TableRow,
-    TableHead,
     TableCell,
-} from "@/components/ui/table"
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import { IConference } from '@/lib/types';
+import { api } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 
 export default function Page() {
 

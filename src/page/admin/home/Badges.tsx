@@ -13,7 +13,7 @@ import { Ban, Rabbit, User, Users } from "lucide-react"
 import { QRCodeSVG } from 'qrcode.react'
 
 export const MemberTypeBadge = ({ type }: { type: string }) => {
-    <Badge variant={type === 'founding' ? 'secondary' : 'outline'}>
+    return <Badge variant={type === 'founding' ? 'secondary' : 'outline'}>
         {type === 'normal' && <User />}
         {type === 'group' && <Users />}
         {type === 'founding' && <Rabbit />}

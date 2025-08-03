@@ -143,7 +143,7 @@ const AddMemberDialog = (props: {
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
-                            )}
+                        )}
                         />
                         <FormField
                             control={form.control}
