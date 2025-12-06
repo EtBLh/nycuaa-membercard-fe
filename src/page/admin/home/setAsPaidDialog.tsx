@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
     Dialog,
     DialogContent,
@@ -30,11 +31,12 @@ const SetAsPaidDialog = (props: {
     rowSelection: Record<string, boolean>
 }) => {
     const [open, setOpen] = useState(false);
+    const [year, setYear] = useState<number>(new Date().getFullYear());
     const { rowSelection, refetch } = props;
 
     const setMemberPaidMutation = useMutation({
         mutationFn: (memberIds: string[]) => {
-            return api.post(`/admin/member/${memberIds.join(',')}/set-paid`, { paid: true });
+            return api.post(`/admin/member/${memberIds.join(',')}/set-paid`, { paid: true, year });
         },
         onSuccess: () => {
             toast.success(`會員已成功設置為已付款`);
@@ -103,14 +105,27 @@ const SetAsPaidDialog = (props: {
                                         <TableCell>{item.id}</TableCell>
                                         <TableCell>{item.name}</TableCell>
                                         <TableCell>
-                                            <PaidStatusBadge permit={item.permit} />
+                                            <PaidStatusBadge id={item.id} permit={item.permit} />
                                         </TableCell>
                                     </TableRow>
                                 ))}
                         </TableBody>
                     </Table>
                 </ScrollArea>
-                <DialogFooter>
+                <DialogFooter className="items-end justify-between">
+                <div className="flex items-end gap-2">
+                    <div className="flex-1 flex flex-col gap-2">
+                        <label className="text-sm font-medium">年份</label>
+                        <Input 
+                            type="number" 
+                            value={year}
+                            onChange={(e) => setYear(parseInt(e.target.value))}
+                            min={2000}
+                            max={new Date().getFullYear() + 10}
+                        />
+                    </div>
+                </div>
+                <div className="flex-1"></div>
                     <Button
                         onClick={setMembersPaid}
                         disabled={

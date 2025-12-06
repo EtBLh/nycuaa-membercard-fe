@@ -206,7 +206,7 @@ const useMemberDataTableColDef = (refetch: () => void) => {
             accessorKey: "permit",
             header: "付費狀態",
             width: 80,
-            cell: ({ row }) => <PaidStatusBadge permit={row.original.permit}/>,
+            cell: ({ row }) => <PaidStatusBadge id={row.original.id} permit={row.original.permit}/>,
         },
         {   
             accessorKey: "icon_uploaded",

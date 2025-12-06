@@ -10,6 +10,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CircleCheck } from 'lucide-react';
@@ -23,6 +25,7 @@ import { toast } from 'sonner';
 const Page = () => {
 
     const [selectedConf, setConf] = useState<number | null>(null);
+    const [memberName, setMemberName] = useState<string>('');
 
     const onScan = (result: IDetectedBarcode[]) => {
         if (selectedConf === null) {
@@ -44,9 +47,9 @@ const Page = () => {
     }, [conferences])
 
     const { mutate: submitCheckinRecord } = useMutation({
-        mutationFn: (qrcode: string) => api.post(`/admin/conference/${selectedConf}/check-in`, {qrcode}),
+        mutationFn: (qrcode: string) => api.post(`/admin/conference/${selectedConf}/check-in`, { qrcode }),
         onSuccess: (res) => {
-            if (res.status === 200 ) {
+            if (res.status === 200) {
                 toast.success('打卡成功!', {
                     description: '歡迎學長學姐蒞會員大會!'
                 })
@@ -59,7 +62,27 @@ const Page = () => {
                 //@ts-ignore
                 description: err.response?.data?.message || '請稍後再試'
             });
-            
+
+        }
+    })
+
+    const { mutate: submitManualCheckin } = useMutation({
+        mutationFn: (name: string) => api.post(`/admin/conference/${selectedConf}/check-in`, { name }),
+        onSuccess: (res) => {
+            if (res.status === 200) {
+                toast.success('打卡成功!', {
+                    description: '歡迎學長學姐蒞會員大會!'
+                })
+            } else if (res.status === 202) {
+                toast.success('已打卡')
+            }
+            setMemberName('')
+        },
+        onError: (err: AxiosError) => {
+            toast.error('打卡失敗', {
+                //@ts-ignore
+                description: err.response?.data?.message || '請稍後再試'
+            });
         }
     })
 
@@ -107,39 +130,40 @@ const Page = () => {
                     <HoverCardContent className='w-[300px] h-[360px]'>
                         <div className='flex flex-col items-center justify-center'>
                             <span className='mb-2'>掃描以下QRcode以製作會員證</span>
-                            <QRCodeSVG value='https://membercard.nycuaa.org' bgColor="#0f172b" fgColor="#f8fafc" size={240}/>
+                            <QRCodeSVG value='https://membercard.nycuaa.org' bgColor="#0f172b" fgColor="#f8fafc" size={240} />
                             <span className='text-sm opacity-[0.8] mt-1'>https://membercard.nycuaa.org</span>
                         </div>
                     </HoverCardContent>
                     <HoverCardTrigger>
-                        <span className='text-lg' style={{textDecoration: 'underline'}}>我要製作會員證！</span>
+                        <span className='text-lg' style={{ textDecoration: 'underline' }}>我要製作會員證！</span>
                     </HoverCardTrigger>
                 </HoverCard>
             </CardFooter>
         </Card>
         <section className='flex items-center justify-center flex-5 relative'>
             <div className='w-[520px] p-[36px] aspect-square items-end'>
-            <Select onValueChange={(val) => setConf(parseInt(val))} value={selectedConf?.toString()}>
-                <SelectTrigger className="w-[180px] mb-2">
-                    <SelectValue placeholder="Select a conference" />
-                </SelectTrigger>
-                <SelectContent>
-                    {
-                        conferences?.map(con => (
-                            <SelectItem value={con.id.toString()}>
-                                {con.name}
-                            </SelectItem>
-                        ))
-                    }
-                </SelectContent>
-            </Select>
+                <Select onValueChange={(val) => setConf(parseInt(val))} value={selectedConf?.toString()}>
+                    <SelectTrigger className="w-[180px] mb-2">
+                        <SelectValue placeholder="Select a conference" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {
+                            conferences?.map(con => (
+                                <SelectItem value={con.id.toString()}>
+                                    {con.name}
+                                </SelectItem>
+                            ))
+                        }
+                    </SelectContent>
+                </Select>
                 <Scanner
                     onScan={onScan}
-                    scanDelay={ 500 }
-                    onError={(err) => {console.error(err)}}
+                    scanDelay={500}
+                    onError={(err) => { console.error(err) }}
                     allowMultiple
                     styles={{
                         container: {
+                            transform: 'scaleX(-1)',
                             border: 'none',
                             background: 'transparent'
                         },
@@ -150,6 +174,28 @@ const Page = () => {
                         finderBorder: 100
                     }}
                 />
+                <div className='flex gap-2 mt-4'>
+                    <Input
+                        placeholder='輸入會員姓名'
+                        value={memberName}
+                        onChange={(e) => setMemberName(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && memberName.trim()) {
+                                submitManualCheckin(memberName)
+                            }
+                        }}
+                    />
+                    <Button
+                        onClick={() => {
+                            if (memberName.trim()) {
+                                submitManualCheckin(memberName)
+                            }
+                        }}
+                        disabled={!memberName.trim()}
+                    >
+                        打卡
+                    </Button>
+                </div>
             </div>
         </section>
     </main>

@@ -1,0 +1,6 @@
+id,name,govid,type,birthday,email,phone
+1,陳大明,A123456789,normal,1990-05-15,chen.daming@example.com,0912345678
+2,李美麗,B987654321,founding,1985-08-22,li.meili@example.com,0923456789
+3,王小剛,C456789123,group,1995-03-10,wang.xiaogang@example.com,0934567890
+4,黃玉玲,D789123456,normal,1992-11-28,huang.yuling@example.com,0945678901
+5,張文傑,E321654987,normal,1988-07-14,zhang.wenjie@example.com,0956789012
