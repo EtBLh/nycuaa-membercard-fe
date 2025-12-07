@@ -72,7 +72,6 @@ const AddConferenceDialog = (props: {
             <DialogTrigger asChild>
                 <Button size="sm">
                     <IconPlus />
-                    <span className="hidden lg:inline">新增會議</span>
                 </Button>
             </DialogTrigger>
             <DialogContent>

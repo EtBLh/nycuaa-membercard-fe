@@ -8,6 +8,7 @@ import AdminPage from './page/admin/home'
 import AdminLayout from "./page/admin/layout"
 import AdminCheckInRecordPage from "./page/admin/checkin-record"
 import AdminBulkAddPage from "./page/admin/bulk-add"
+import AdminLogsPage from "./page/admin/logs";
 import CheckInPage from './page/admin/checkin'
 import CheckInRecordPage from './page/admin/checkin-record'
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -38,6 +39,7 @@ function App() {
                 <Route path='home' element={<AdminPage />}/>
                 <Route path='checkin-record' element={<AdminCheckInRecordPage />}/>
                 <Route path='bulk-add' element={<AdminBulkAddPage />}/>
+                <Route path='logs' element={<AdminLogsPage />}/>
                 <Route path='conference/checkin' element={<CheckInPage />}/>
                 <Route path='conference/checkin-record' element={<CheckInRecordPage />}/>
               </Route>

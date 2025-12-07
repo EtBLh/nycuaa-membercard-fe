@@ -6,7 +6,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { ScanQrCode, ScrollText, UserPlus, UsersIcon } from "lucide-react"
+import { ScanQrCode, Scroll, ScrollText, UserPlus, UsersIcon } from "lucide-react"
 import { Link, useLocation } from "react-router-dom"
 
 const memberBtns = [
@@ -29,9 +29,17 @@ const checkInBtns = [
     to: '/admin/conference/checkin'
   },
   {
-    title: '打卡記錄',
+    title: '會議總覽',
     icon: ScrollText,
     to: '/admin/checkin-record'
+  },
+]
+
+const logBtns = [
+  {
+    title: '系統日誌',
+    icon: Scroll,
+    to: '/admin/logs'
   },
 ]
 
@@ -74,6 +82,10 @@ export function NavMain() {
           <SidebarGroupLabel>會議打卡</SidebarGroupLabel>
           {
             checkInBtns.map(NavFactory)
+          }
+          <SidebarGroupLabel>系統日誌</SidebarGroupLabel>
+          {
+            logBtns.map(NavFactory)
           }
         </SidebarMenu>
       </SidebarGroupContent>

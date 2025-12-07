@@ -109,7 +109,7 @@ const Page = () => {
                     <img src={CheckInStep1} alt="open apple wallet / pass2u" className='rounded-md border mt-2' />
                 </div>
                 <div className='p-1'>
-                    <span className='text-sm'>Step 2. 握描會員證內的QRcode</span>
+                    <span className='text-sm'>Step 2. 掃描會員證內的QRcode</span>
                     <img src={CheckInStep2} alt="open apple wallet / pass2u" className='rounded-md border mt-2' />
                 </div>
                 <div className='col-span-2 p-1'>
@@ -142,9 +142,9 @@ const Page = () => {
         </Card>
         <section className='flex items-center justify-center flex-5 relative'>
             <div className='w-[520px] p-[36px] aspect-square items-end'>
-                <Select onValueChange={(val) => setConf(parseInt(val))} value={selectedConf?.toString()}>
+                <Select onValueChange={(val) => setConf(parseInt(val))} value={selectedConf?.toString()} disabled={isLoading || conferences?.length === 0}>
                     <SelectTrigger className="w-[180px] mb-2">
-                        <SelectValue placeholder="Select a conference" />
+                        <SelectValue placeholder={conferences?.length === 0 ? "No conferences available" : "Select a conference"} />
                     </SelectTrigger>
                     <SelectContent>
                         {
@@ -187,11 +187,11 @@ const Page = () => {
                     />
                     <Button
                         onClick={() => {
-                            if (memberName.trim()) {
+                            if (memberName.trim() && selectedConf !== null) {
                                 submitManualCheckin(memberName)
                             }
                         }}
-                        disabled={!memberName.trim()}
+                        disabled={!memberName.trim() || selectedConf === null}
                     >
                         打卡
                     </Button>
