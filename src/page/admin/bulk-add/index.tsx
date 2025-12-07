@@ -27,10 +27,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge"
 import { api } from "@/lib/utils"
 import { useMutation } from "@tanstack/react-query"
 import { AxiosError } from "axios"
 import { toast } from "sonner"
+import { X } from "lucide-react"
 
 export const MemberMinimalSchema = z.object({
     id: z.number(),
@@ -53,6 +55,41 @@ export default function Page() {
     const [showMappingDialog, setShowMappingDialog] = React.useState(false)
     const [csvHeaders, setCsvHeaders] = React.useState<string[]>([])
     const [rowTypes, setRowTypes] = React.useState<Record<number, string>>({})
+    const [invalidNames, setInvalidNames] = React.useState<Set<string>>(new Set())
+    const [invalidIds, setInvalidIds] = React.useState<Set<number>>(new Set())
+    const [internalInvalidNames, setInternalInvalidNames] = React.useState<Set<string>>(new Set())
+    const [internalInvalidIds, setInternalInvalidIds] = React.useState<Set<number>>(new Set())
+
+    // Compute current invalid rows based on all invalid names and ids
+    const currentInvalidRows = React.useMemo(() => {
+        const nameIndex = columnMapping['name']
+        const idIndex = columnMapping['id']
+        const invalid = new Set<number>()
+
+        csvData.forEach((row, rowIndex) => {
+            let isInvalid = false
+
+            if (nameIndex !== undefined) {
+                const name = row[nameIndex]
+                if (name && (invalidNames.has(name) || internalInvalidNames.has(name))) {
+                    isInvalid = true
+                }
+            }
+
+            if (idIndex !== undefined) {
+                const id = parseInt(row[idIndex])
+                if (!isNaN(id) && (invalidIds.has(id) || internalInvalidIds.has(id))) {
+                    isInvalid = true
+                }
+            }
+
+            if (isInvalid) {
+                invalid.add(rowIndex)
+            }
+        })
+
+        return invalid
+    }, [csvData, columnMapping, invalidNames, invalidIds, internalInvalidNames, internalInvalidIds])
 
     // useMutation for saving data
     const saveMutation = useMutation({
@@ -64,6 +101,10 @@ export default function Page() {
             setColumnMapping({})
             setCsvHeaders([])
             setRowTypes({})
+            setInvalidNames(new Set())
+            setInvalidIds(new Set())
+            setInternalInvalidNames(new Set())
+            setInternalInvalidIds(new Set())
             setShowMappingDialog(false)
             if (fileInputRef.current) {
                 fileInputRef.current.value = ""
@@ -74,6 +115,65 @@ export default function Page() {
             toast.error(error.message || "導入失敗")
         },
     })
+
+    // Mutation for checking duplicates
+    const checkDuplicatesMutation = useMutation({
+        mutationFn: async (data: { names: string[], ids: number[] }) => {
+            const responses = await Promise.all([
+                api.post<{ invalid: string[] }>('/admin/member/check-duplicate/name', { names: data.names }),
+                api.post<{ invalid: number[] }>('/admin/member/check-duplicate/id', { ids: data.ids })
+            ])
+            return {
+                invalidNames: responses[0].data.invalid,
+                invalidIds: responses[1].data.invalid
+            }
+        },
+        onSuccess: (result) => {
+            setInvalidNames(new Set(result.invalidNames))
+            setInvalidIds(new Set(result.invalidIds))
+            
+            if (result.invalidNames.length > 0 || result.invalidIds.length > 0) {
+                const count = result.invalidNames.length + result.invalidIds.length
+                toast.error(`發現 ${count} 個在資料庫中重複的會員`)
+            }
+        },
+        onError: () => {
+            toast.error("檢查重複會員失敗")
+        }
+    })
+
+    // Check for duplicates within CSV data itself
+    const checkInternalDuplicates = (data: string[][], mapping: Record<string, number>) => {
+        const nameIndex = mapping['name']
+        const idIndex = mapping['id']
+        const internalInvalidNames = new Set<string>()
+        const internalInvalidIds = new Set<number>()
+
+        if (nameIndex !== undefined || idIndex !== undefined) {
+            const seenNames = new Set<string>()
+            const seenIds = new Set<number>()
+
+            data.forEach((row) => {
+                if (nameIndex !== undefined) {
+                    const name = row[nameIndex]
+                    if (name && seenNames.has(name)) {
+                        internalInvalidNames.add(name)
+                    }
+                    if (name) seenNames.add(name)
+                }
+
+                if (idIndex !== undefined) {
+                    const id = parseInt(row[idIndex])
+                    if (!isNaN(id) && seenIds.has(id)) {
+                        internalInvalidIds.add(id)
+                    }
+                    if (!isNaN(id)) seenIds.add(id)
+                }
+            })
+        }
+
+        return { internalInvalidNames, internalInvalidIds }
+    }
 
     // Handle CSV file selection
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,6 +205,26 @@ export default function Page() {
                         initialRowTypes[index] = "normal"
                     })
                     setRowTypes(initialRowTypes)
+
+                    // Check for internal duplicates after mapping
+                    const { internalInvalidNames, internalInvalidIds } = checkInternalDuplicates(data.slice(1), initialMapping)
+                    setInternalInvalidNames(internalInvalidNames)
+                    setInternalInvalidIds(internalInvalidIds)
+
+                    // Check against database if both name and id are mapped
+                    if (initialMapping['name'] !== undefined && initialMapping['id'] !== undefined) {
+                        const names: string[] = []
+                        const ids: number[] = []
+
+                        data.slice(1).forEach(row => {
+                            const name = row[initialMapping['name']]
+                            const id = parseInt(row[initialMapping['id']])
+                            if (name) names.push(name)
+                            if (!isNaN(id)) ids.push(id)
+                        })
+
+                        checkDuplicatesMutation.mutate({ names, ids })
+                    }
                 } else {
                     toast.error("CSV 文件為空")
                 }
@@ -117,10 +237,34 @@ export default function Page() {
 
     // Handle column mapping change
     const handleMappingChange = (column: string, headerIndex: number) => {
-        setColumnMapping(prev => ({
-            ...prev,
-            [column]: headerIndex
-        }))
+        setColumnMapping(prev => {
+            const updated = {
+                ...prev,
+                [column]: headerIndex
+            }
+            
+            // Check for internal duplicates first
+            const { internalInvalidNames, internalInvalidIds } = checkInternalDuplicates(csvData, updated)
+            setInternalInvalidNames(internalInvalidNames)
+            setInternalInvalidIds(internalInvalidIds)
+
+            // Check for duplicates when both name and id columns are mapped
+            if (updated['name'] !== undefined && updated['id'] !== undefined) {
+                const names: string[] = []
+                const ids: number[] = []
+                
+                csvData.forEach(row => {
+                    const name = row[updated['name']]
+                    const id = parseInt(row[updated['id']])
+                    if (name) names.push(name)
+                    if (!isNaN(id)) ids.push(id)
+                })
+                
+                checkDuplicatesMutation.mutate({ names, ids })
+            }
+            
+            return updated
+        })
     }
 
     // Prepare data for submission
@@ -227,6 +371,8 @@ export default function Page() {
                                                     {column}
                                                 </TableHead>
                                             ))}
+                                            <TableHead className="text-center text-xs">狀態</TableHead>
+                                            <TableHead className="text-center text-xs"></TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -265,6 +411,35 @@ export default function Page() {
                                                         </TableCell>
                                                     )
                                                 })}
+                                                <TableCell className="text-center">
+                                                    {currentInvalidRows.has(rowIndex) ? (
+                                                        <Badge variant="destructive">重複</Badge>
+                                                    ) : (
+                                                        <Badge variant="outline">有效</Badge>
+                                                    )}
+                                                </TableCell>
+                                                <TableCell className="text-center">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        onClick={() => {
+                                                            const updatedData = csvData.filter((_, i) => i !== rowIndex)
+                                                            setCsvData(updatedData)
+                                                            setRowTypes(prev => {
+                                                                const updated = { ...prev }
+                                                                delete updated[rowIndex]
+                                                                return updated
+                                                            })
+                                                            
+                                                            // Re-check internal duplicates after deletion
+                                                            const { internalInvalidNames, internalInvalidIds } = checkInternalDuplicates(updatedData, columnMapping)
+                                                            setInternalInvalidNames(internalInvalidNames)
+                                                            setInternalInvalidIds(internalInvalidIds)
+                                                        }}
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </Button>
+                                                </TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -279,7 +454,7 @@ export default function Page() {
                         </Button>
                         <Button
                             onClick={handleConfirm}
-                            disabled={saveMutation.isPending || !REQUIRED_COLUMNS.every(col => col in columnMapping)}
+                            disabled={saveMutation.isPending || !REQUIRED_COLUMNS.every(col => col in columnMapping) || currentInvalidRows.size > 0}
                         >
                             {saveMutation.isPending ? "導入中..." : "確認並導入"}
                         </Button>

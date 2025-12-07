@@ -41,7 +41,9 @@ import { useSelector } from "react-redux"
 import AddMemberDialog from "./addMemberDialog"
 import SendEmailDialog from "./sendEmailDialog"
 import SetAsPaidDialog from "./setAsPaidDialog"
+import ChangePermitYearDialog from "./changePermitYearDialog"
 import useMemberDataTableColDef from "./useMemberDataTableColDef"
+import { ButtonGroup } from "@/components/ui/button-group"
 
 export const MemberFullSchema = z.object({
   id: z.number(),
@@ -68,6 +70,7 @@ export function DataTable() {
     pageIndex: 0,
     pageSize: 50,
   })
+  const [permitYear, setPermitYear] = React.useState<number | undefined>();
   useEffect(() => {
     setPagination(prev => ({
       pageIndex: 0,
@@ -77,13 +80,14 @@ export function DataTable() {
 
 
   const { data, isLoading: loading, refetch } = useQuery({
-    queryKey: ['memberlist', token, pagination.pageIndex, pagination.pageSize, searchValue],
+    queryKey: ['memberlist', token, pagination.pageIndex, pagination.pageSize, searchValue, permitYear],
     queryFn: () =>
       api.get<{ members: IMemberData[]; total: number }>('/admin/members', {
         params: {
           page: pagination.pageIndex,
           pagesize: pagination.pageSize,
           search: searchValue,
+          permit_year: permitYear
         },
       }),
     select: res => res.data
@@ -124,6 +128,7 @@ export function DataTable() {
     <div className="w-full flex-col justify-start gap-6">
       <div className="flex items-center justify-between px-4 lg:px-6 flex-wrap lg:flex-nowrap">
         <div className="flex items-center w-full md:w-auto gap-2">
+          <AddMemberDialog refetch={refetch} />
           <SearchInput
             className="md:w-[280px]"
             placeholder="Search"
@@ -134,9 +139,11 @@ export function DataTable() {
           />
         </div>
         <div className="flex items-center gap-2 w-full md:w-auto">
-          <SetAsPaidDialog refetch={refetch} rowSelection={rowSelection} />
+          <ButtonGroup>
+            <SetAsPaidDialog refetch={refetch} rowSelection={rowSelection} />
+            <ChangePermitYearDialog refetch={refetch} permitYear={permitYear} setPermitYear={setPermitYear} />
+          </ButtonGroup>
           <SendEmailDialog refetch={refetch} rowSelection={rowSelection} />
-          <AddMemberDialog refetch={refetch} />
         </div>
       </div>
       <div className="relative flex flex-col gap-4 overflow-auto px-4 lg:px-6 mt-4">
